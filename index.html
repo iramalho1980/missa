@@ -1024,8 +1024,8 @@
 
             modalTitle.innerHTML = `<i class="fas fa-music"></i> ${songName}`;
             
-            // Construct the path to the PDF - ajustado para buscar na pasta letras
-            const pdfPath = `letras/[+] Letras/${encodeURIComponent(category)}/${filename}`;
+            // Construct the path to the PDF - ajustado para buscar na pasta Letras
+            const pdfPath = `Letras/[+] Letras/${encodeURIComponent(category)}/${filename}`;
             pdfViewer.src = pdfPath;
             
             modal.style.display = 'block';
