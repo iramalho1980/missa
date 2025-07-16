@@ -1,0 +1,1674 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Letras de Música - Visualizador</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Open Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 25%, #2d4a3e 50%, #1a1a1a 75%, #000000 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            background: linear-gradient(45deg, #ffd700, #ffed4e, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 300;
+            margin-bottom: 25px;
+        }
+
+        .search-container {
+            max-width: 500px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            font-size: 1.1rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 25px;
+            color: #ffffff;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .search-input:focus {
+            border-color: #ffd700;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #ffd700;
+            font-size: 1.2rem;
+            pointer-events: none;
+        }
+
+        .search-results {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            display: none;
+        }
+
+        .search-results.active {
+            display: block;
+        }
+
+        .search-result-item {
+            padding: 10px 15px;
+            margin: 5px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .search-result-item:hover {
+            background: rgba(255, 215, 0, 0.1);
+            transform: translateX(5px);
+        }
+
+        .search-result-name {
+            font-weight: 500;
+            color: #ffffff;
+        }
+
+        .search-result-category {
+            font-size: 0.9rem;
+            color: #ffd700;
+            background: rgba(255, 215, 0, 0.2);
+            padding: 3px 8px;
+            border-radius: 8px;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .category-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 25px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #ffd700, #ffed4e, #ffd700);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .category-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .category-card:hover {
+            transform: translateY(-8px);
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 215, 0, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(255, 215, 0, 0.1);
+        }
+
+        .category-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #ffd700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .category-icon {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #000;
+            font-weight: bold;
+        }
+
+        .songs-list {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, opacity 0.4s ease;
+            opacity: 0;
+        }
+
+        .category-card.expanded .songs-list {
+            max-height: 300px;
+            opacity: 1;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .songs-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .songs-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        .songs-list::-webkit-scrollbar-thumb {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            border-radius: 3px;
+        }
+
+        .songs-list::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(45deg, #ffed4e, #ffd700);
+        }
+
+        .song-item {
+            padding: 12px 15px;
+            margin: 8px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .song-item:hover {
+            background: rgba(255, 215, 0, 0.1);
+            border-color: rgba(255, 215, 0, 0.3);
+            transform: translateX(5px);
+        }
+
+        .song-icon {
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: #000;
+            font-weight: bold;
+        }
+
+        .song-name {
+            flex: 1;
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.9);
+            text-transform: capitalize;
+        }
+
+        .song-count {
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-content {
+            position: relative;
+            margin: 2% auto;
+            width: 95%;
+            max-width: 900px;
+            height: 90vh;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #000000, #2d4a3e);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #ffd700;
+        }
+
+        .close {
+            color: #ffd700;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .close:hover {
+            background: rgba(255, 215, 0, 0.2);
+            transform: rotate(90deg);
+        }
+
+        .pdf-viewer {
+            width: 100%;
+            height: calc(90vh - 80px);
+            border: none;
+            background: white;
+        }
+
+        .image-viewer {
+            width: 100%;
+            height: calc(90vh - 80px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f0f0f0;
+        }
+
+        .image-viewer img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 215, 0, 0.3);
+            border-top: 3px solid #ffd700;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .categories-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .modal-content {
+                width: 98%;
+                height: 95vh;
+                margin: 1% auto;
+            }
+
+            .category-card {
+                padding: 20px;
+            }
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(45deg, #ffed4e, #ffd700);
+        }
+
+        /* Floating particles effect */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(255, 215, 0, 0.3);
+            border-radius: 50%;
+            animation: float 6s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Missa de hoje styles */
+        .missa-hoje-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 350px;
+            max-height: 80vh;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            padding: 20px;
+            z-index: 100;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .missa-hoje-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #ffd700;
+            margin-bottom: 15px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .missa-hoje-icon {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #000;
+            font-weight: bold;
+        }
+
+        .missa-drop-zone {
+            min-height: 200px;
+            border: 2px dashed rgba(255, 215, 0, 0.3);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .missa-drop-zone.drag-over {
+            border-color: #ffd700;
+            background: rgba(255, 215, 0, 0.1);
+            transform: scale(1.02);
+        }
+
+        .missa-drop-zone.empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .missa-song-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 10px;
+            margin: 8px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .missa-song-item:hover {
+            background: rgba(255, 215, 0, 0.1);
+            border-color: rgba(255, 215, 0, 0.3);
+        }
+
+        .missa-song-name {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.9rem;
+            flex: 1;
+        }
+
+        .missa-song-category {
+            font-size: 0.8rem;
+            color: #ffd700;
+            background: rgba(255, 215, 0, 0.2);
+            padding: 2px 6px;
+            border-radius: 6px;
+            margin-right: 8px;
+        }
+
+        .remove-song-btn {
+            background: rgba(255, 0, 0, 0.2);
+            color: #ff6b6b;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .remove-song-btn:hover {
+            background: rgba(255, 0, 0, 0.4);
+            transform: scale(1.1);
+        }
+
+        .missa-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .missa-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .missa-btn.clear {
+            background: rgba(255, 0, 0, 0.2);
+            color: #ff6b6b;
+        }
+
+        .missa-btn.clear:hover {
+            background: rgba(255, 0, 0, 0.3);
+        }
+
+        .missa-btn.save {
+            background: rgba(0, 255, 0, 0.2);
+            color: #4ade80;
+        }
+
+        .missa-btn.save:hover {
+            background: rgba(0, 255, 0, 0.3);
+        }
+
+        /* Draggable song items */
+        .song-item.draggable {
+            cursor: grab;
+            user-select: none;
+        }
+
+        .song-item.dragging {
+            opacity: 0.5;
+            transform: rotate(5deg);
+        }
+
+        /* Toggle button for Missa de hoje */
+        .missa-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 215, 0, 0.2);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 101;
+            transition: all 0.3s ease;
+            color: #ffd700;
+            font-size: 1.2rem;
+        }
+
+        .missa-toggle:hover {
+            background: rgba(255, 215, 0, 0.3);
+            transform: scale(1.1);
+        }
+
+        .missa-hoje-container.hidden {
+            display: none;
+        }
+
+        /* File type indicator */
+        .file-type-indicator {
+            font-size: 0.7rem;
+            background: rgba(255, 215, 0, 0.3);
+            color: #ffd700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: auto;
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating particles -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Toggle button for Missa de hoje -->
+    <div class="missa-toggle" id="missaToggle" title="Missa de hoje">
+        ⛪
+    </div>
+
+    <!-- Missa de hoje container -->
+    <div class="missa-hoje-container hidden" id="missaHojeContainer">
+        <div class="missa-hoje-title">
+            <div class="missa-hoje-icon">⛪</div>
+            Missa de hoje
+        </div>
+        <div class="missa-drop-zone empty" id="missaDropZone">
+            <div>📋</div>
+            <div>Arraste os cânticos aqui</div>
+            <div style="font-size: 0.8rem; margin-top: 5px;">para organizar a missa</div>
+        </div>
+        <div class="missa-actions">
+            <button class="missa-btn clear" onclick="clearMissa()">Limpar</button>
+            <button class="missa-btn save" onclick="saveMissa()">Salvar</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>🎵 Letras de Música</h1>
+            <p>Explore nossa coleção de letras organizadas por categoria</p>
+            
+            <div class="search-container">
+                <input type="text" class="search-input" id="searchInput" placeholder="Buscar músicas pelo nome ou conteúdo...">
+                <span class="search-icon">🔍</span>
+                <div class="search-results" id="searchResults"></div>
+            </div>
+        </div>
+
+        <div class="categories-grid" id="categoriesGrid">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Carregando letras...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for PDF/Image viewing -->
+    <div id="fileModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">Carregando...</div>
+                <span class="close" id="closeModal">&times;</span>
+            </div>
+            <iframe class="pdf-viewer" id="pdfViewer" src="" style="display: none;"></iframe>
+            <div class="image-viewer" id="imageViewer" style="display: none;">
+                <img id="imageContent" src="" alt="Letra da música">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Lyrics data - populated from the extracted files
+        const lyricsData = {
+            "1 - Entrada": [
+                {
+                    "name": "a biblia e a palavra de deus",
+                    "path": "./letras/Letras/1 - Entrada/a_biblia_e_a_palavra_de_deus.pdf"
+                },
+                {
+                    "name": "bom pastor",
+                    "path": "./letras/Letras/1 - Entrada/bom_pastor.pdf"
+                },
+                {
+                    "name": "coração santo",
+                    "path": "./letras/Letras/1 - Entrada/coração_santo.pdf"
+                },
+                {
+                    "name": "cristo ressucitou aleluia",
+                    "path": "./letras/Letras/1 - Entrada/cristo_ressucitou_aleluia.pdf"
+                },
+                {
+                    "name": "deixa a luz do ceu entrar",
+                    "path": "./letras/Letras/1 - Entrada/deixa_a_luz_do_ceu_entrar.pdf"
+                },
+                {
+                    "name": "eis me aqui senhor",
+                    "path": "./letras/Letras/1 - Entrada/eis_me_aqui_senhor.pdf"
+                },
+                {
+                    "name": "Entrada - Por Entre Aclamações",
+                    "path": "./letras/Letras/1 - Entrada/Entrada - Por Entre Aclamações.pdf"
+                },
+                {
+                    "name": "Entrada - Vamos Celebrar",
+                    "path": "./letras/Letras/1 - Entrada/Entrada - Vamos Celebrar.pdf"
+                },
+                {
+                    "name": "estaremos aqui reunidos",
+                    "path": "./letras/Letras/1 - Entrada/estaremos_aqui_reunidos.pdf"
+                },
+                {
+                    "name": "faco novas todas as coisas",
+                    "path": "./letras/Letras/1 - Entrada/faco_novas_todas_as_coisas.pdf"
+                },
+                {
+                    "name": "hosana hey hosana ha",
+                    "path": "./letras/Letras/1 - Entrada/hosana_hey_hosana_ha.pdf"
+                },
+                {
+                    "name": "Oh senhor nos estamos aqui",
+                    "path": "./letras/Letras/1 - Entrada/Oh senhor nos estamos aqui.jpeg"
+                },
+                {
+                    "name": "por sua morte",
+                    "path": "./letras/Letras/1 - Entrada/por_sua_morte.pdf"
+                },
+                {
+                    "name": "porque ele vive",
+                    "path": "./letras/Letras/1 - Entrada/porque_ele_vive.pdf"
+                },
+                {
+                    "name": "senhor quem entrara",
+                    "path": "./letras/Letras/1 - Entrada/senhor_quem_entrara.pdf"
+                },
+                {
+                    "name": "te amarei",
+                    "path": "./letras/Letras/1 - Entrada/te_amarei.pdf"
+                },
+                {
+                    "name": "toda biblia e comunicacao",
+                    "path": "./letras/Letras/1 - Entrada/toda_biblia_e_comunicacao.pdf"
+                },
+                {
+                    "name": "tu es a razao da jornada",
+                    "path": "./letras/Letras/1 - Entrada/tu_es_a_razao_da_jornada.pdf"
+                },
+                {
+                    "name": "vem louvar",
+                    "path": "./letras/Letras/1 - Entrada/vem_louvar.pdf"
+                }
+            ],
+            "2 - Ato Penitencial": [
+                {
+                    "name": "conheco um coracao",
+                    "path": "./letras/Letras/2 - Ato Penitencial/conheco_um_coracao.pdf"
+                },
+                {
+                    "name": "coracoes arrependidos",
+                    "path": "./letras/Letras/2 - Ato Penitencial/coracoes_arrependidos.pdf"
+                },
+                {
+                    "name": "Eu confesso a Deus",
+                    "path": "./letras/Letras/2 - Ato Penitencial/Eu confesso a Deus.jpeg"
+                },
+                {
+                    "name": "kyrie eleison jmj",
+                    "path": "./letras/Letras/2 - Ato Penitencial/kyrie_eleison_jmj.pdf"
+                },
+                {
+                    "name": "pelos pecados senhor piedade de nos",
+                    "path": "./letras/Letras/2 - Ato Penitencial/pelos_pecados_senhor_piedade_de_nos.pdf"
+                },
+                {
+                    "name": "perdao senhor",
+                    "path": "./letras/Letras/2 - Ato Penitencial/perdao_senhor.pdf"
+                },
+                {
+                    "name": "renovame",
+                    "path": "./letras/Letras/2 - Ato Penitencial/renovame.pdf"
+                },
+                {
+                    "name": "renovame ii",
+                    "path": "./letras/Letras/2 - Ato Penitencial/renovame_ii.pdf"
+                },
+                {
+                    "name": "senhor que viestes salvar kirie elleisson",
+                    "path": "./letras/Letras/2 - Ato Penitencial/senhor_que_viestes_salvar_kirie_elleisson.pdf"
+                },
+                {
+                    "name": "senhor tende piedade de nos",
+                    "path": "./letras/Letras/2 - Ato Penitencial/senhor_tende_piedade_de_nos.pdf"
+                },
+                {
+                    "name": "senhor tende piedade perdoai nossa culpa",
+                    "path": "./letras/Letras/2 - Ato Penitencial/senhor_tende_piedade_perdoai_nossa_culpa.pdf"
+                }
+            ],
+            "3 - Glória": [
+                {
+                    "name": "a ele seja a gloria",
+                    "path": "./letras/Letras/3 - Glória/a_ele_seja_a_gloria.pdf"
+                },
+                {
+                    "name": "Gloria a Deus",
+                    "path": "./letras/Letras/3 - Glória/Gloria a Deus.jpeg"
+                },
+                {
+                    "name": "gloria a deus nas alturas",
+                    "path": "./letras/Letras/3 - Glória/gloria_a_deus_nas_alturas.pdf"
+                },
+                {
+                    "name": "gloria a deus nas alturas rock balada",
+                    "path": "./letras/Letras/3 - Glória/gloria_a_deus_nas_alturas__rock_balada.pdf"
+                },
+                {
+                    "name": "gloria ao pai criador",
+                    "path": "./letras/Letras/3 - Glória/gloria_ao_pai_criador.pdf"
+                }
+            ],
+            "4 - Salmo": [],
+            "5 - Aclamação Evangelho": [
+                {
+                    "name": "a minhalma abrirei",
+                    "path": "./letras/Letras/5 - Aclamação Evangelho/a_minhalma_abrirei.pdf"
+                },
+                {
+                    "name": "a vossa palavra senhor",
+                    "path": "./letras/Letras/5 - Aclamação Evangelho/a_vossa_palavra_senhor.pdf"
+                },
+                {
+                    "name": "aleluia como o pai me amou",
+                    "path": "./letras/Letras/5 - Aclamação Evangelho/aleluia_como_o_pai_me_amou.pdf"
+                },
+                {
+                    "name": "buscai primeiro o reino de deus",
+                    "path": "./letras/Letras/5 - Aclamação Evangelho/buscai_primeiro_o_reino_de_deus.pdf"
+                },
+                {
+                    "name": "como sao belos",
+                    "path": "./letras/Letras/5 - Aclamação Evangelho/como_sao_belos.pdf"
+                },
+                {
+                    "name": "eu vim para escutar",
+                    "path": "./letras/Letras/5 - Aclamação Evangelho/eu_vim_para_escutar.pdf"
+                },
+                {
+                    "name": "palavra de salvacao",
+                    "path": "./letras/Letras/5 - Aclamação Evangelho/palavra_de_salvacao.pdf"
+                },
+                {
+                    "name": "que alegria cristo ressurgiu",
+                    "path": "./letras/Letras/5 - Aclamação Evangelho/que_alegria_cristo_ressurgiu.pdf"
+                },
+                {
+                    "name": "vai falar no evangelho",
+                    "path": "./letras/Letras/5 - Aclamação Evangelho/vai_falar_no_evangelho.pdf"
+                },
+                {
+                    "name": "vinde espirito de deus",
+                    "path": "./letras/Letras/5 - Aclamação Evangelho/vinde_espirito_de_deus.pdf"
+                }
+            ],
+            "6 - Ofertório": [
+                {
+                    "name": "a mesa santa que preparamos",
+                    "path": "./letras/Letras/6 - Ofertório/a_mesa_santa_que_preparamos.pdf"
+                },
+                {
+                    "name": "de maos estendidas",
+                    "path": "./letras/Letras/6 - Ofertório/de_maos_estendidas.pdf"
+                },
+                {
+                    "name": "meu coracao eh para ti",
+                    "path": "./letras/Letras/6 - Ofertório/meu_coracao_eh_para_ti.pdf"
+                },
+                {
+                    "name": "minha vida tem sentido",
+                    "path": "./letras/Letras/6 - Ofertório/minha_vida_tem_sentido.pdf"
+                },
+                {
+                    "name": "muitos graos de trigo",
+                    "path": "./letras/Letras/6 - Ofertório/muitos_graos_de_trigo.pdf"
+                },
+                {
+                    "name": "ofertas singelas",
+                    "path": "./letras/Letras/6 - Ofertório/ofertas_singelas.pdf"
+                },
+                {
+                    "name": "sabes senhor",
+                    "path": "./letras/Letras/6 - Ofertório/sabes_senhor.pdf"
+                },
+                {
+                    "name": "um coracao para amar",
+                    "path": "./letras/Letras/6 - Ofertório/um_coracao_para_amar.pdf"
+                }
+            ],
+            "7 - Santo": [
+                {
+                    "name": "hosana eh",
+                    "path": "./letras/Letras/7 - Santo/hosana_eh.pdf"
+                },
+                {
+                    "name": "hosana no alto ceu",
+                    "path": "./letras/Letras/7 - Santo/hosana_no_alto_ceu.pdf"
+                },
+                {
+                    "name": "Nosso Deus senhor é santo",
+                    "path": "./letras/Letras/7 - Santo/Nosso Deus senhor é santo.jpeg"
+                },
+                {
+                    "name": "o senhor eh santo",
+                    "path": "./letras/Letras/7 - Santo/o_senhor_eh_santo.pdf"
+                },
+                {
+                    "name": "santo santo e",
+                    "path": "./letras/Letras/7 - Santo/santo_santo_e.pdf"
+                }
+            ],
+            "8 - Cordeiro de Deus": [
+                {
+                    "name": "cordeiro do maior",
+                    "path": "./letras/Letras/8 - Cordeiro de Deus/cordeiro_do_maior.pdf"
+                }
+            ],
+            "9 - Comunhão": [
+                {
+                    "name": "a barca",
+                    "path": "./letras/Letras/9 - Comunhão/a_barca.pdf"
+                },
+                {
+                    "name": "a ti meu deus",
+                    "path": "./letras/Letras/9 - Comunhão/a_ti_meu_deus.pdf"
+                },
+                {
+                    "name": "antes da morte e ressurreicao",
+                    "path": "./letras/Letras/9 - Comunhão/antes_da_morte_e_ressurreicao.pdf"
+                },
+                {
+                    "name": "cantar a beleza da vida",
+                    "path": "./letras/Letras/9 - Comunhão/cantar_a_beleza_da_vida.pdf"
+                },
+                {
+                    "name": "como es lindo",
+                    "path": "./letras/Letras/9 - Comunhão/como_es_lindo.pdf"
+                },
+                {
+                    "name": "Comunhão - Presença Linda",
+                    "path": "./letras/Letras/9 - Comunhão/Comunhão - Presença Linda.pdf"
+                },
+                {
+                    "name": "conheço um coração",
+                    "path": "./letras/Letras/9 - Comunhão/conheço_um_coração.pdf"
+                },
+                {
+                    "name": "da cepa brotou a rama",
+                    "path": "./letras/Letras/9 - Comunhão/da_cepa_brotou_a_rama.pdf"
+                },
+                {
+                    "name": "desamarrem as sandalias",
+                    "path": "./letras/Letras/9 - Comunhão/desamarrem_as_sandalias.pdf"
+                },
+                {
+                    "name": "estas entre nos",
+                    "path": "./letras/Letras/9 - Comunhão/estas_entre_nos.pdf"
+                },
+                {
+                    "name": "este pranto em minhas maos",
+                    "path": "./letras/Letras/9 - Comunhão/este_pranto_em_minhas_maos.pdf"
+                },
+                {
+                    "name": "eu navegarei",
+                    "path": "./letras/Letras/9 - Comunhão/eu_navegarei.pdf"
+                },
+                {
+                    "name": "eu quis comer esta ceia agora",
+                    "path": "./letras/Letras/9 - Comunhão/eu_quis_comer_esta_ceia_agora.pdf"
+                },
+                {
+                    "name": "eu vim para que todos tenham vida",
+                    "path": "./letras/Letras/9 - Comunhão/eu_vim_para_que_todos_tenham_vida.pdf"
+                },
+                {
+                    "name": "pelos prados",
+                    "path": "./letras/Letras/9 - Comunhão/pelos_prados.pdf"
+                },
+                {
+                    "name": "procuro abrigo nos coracoes",
+                    "path": "./letras/Letras/9 - Comunhão/procuro_abrigo_nos_coracoes.pdf"
+                },
+                {
+                    "name": "quando teu pai revelou",
+                    "path": "./letras/Letras/9 - Comunhão/quando_teu_pai_revelou.pdf"
+                },
+                {
+                    "name": "quem nos separara",
+                    "path": "./letras/Letras/9 - Comunhão/quem_nos_separara.pdf"
+                },
+                {
+                    "name": "sacramento da comunhao",
+                    "path": "./letras/Letras/9 - Comunhão/sacramento_da_comunhao.pdf"
+                },
+                {
+                    "name": "sim eu quero",
+                    "path": "./letras/Letras/9 - Comunhão/sim_eu_quero.pdf"
+                },
+                {
+                    "name": "sonda me",
+                    "path": "./letras/Letras/9 - Comunhão/sonda_me.pdf"
+                },
+                {
+                    "name": "vem eu mostrarei",
+                    "path": "./letras/Letras/9 - Comunhão/vem_eu_mostrarei.pdf"
+                },
+                {
+                    "name": "vou cantar teu amor",
+                    "path": "./letras/Letras/9 - Comunhão/vou_cantar_teu_amor.pdf"
+                }
+            ],
+            "10 - Final": [
+                {
+                    "name": "a alegria esta no coracao",
+                    "path": "./letras/Letras/10 - Final/a_alegria_esta_no_coracao.pdf"
+                },
+                {
+                    "name": "anjos de deus",
+                    "path": "./letras/Letras/10 - Final/anjos_de_deus.pdf"
+                },
+                {
+                    "name": "como o pai me enviou",
+                    "path": "./letras/Letras/10 - Final/como_o_pai_me_enviou.pdf"
+                },
+                {
+                    "name": "cristo eh a felicidade",
+                    "path": "./letras/Letras/10 - Final/cristo_eh_a_felicidade.pdf"
+                },
+                {
+                    "name": "deixa luz do ceu entrar",
+                    "path": "./letras/Letras/10 - Final/deixa_luz_do_ceu_entrar.pdf"
+                },
+                {
+                    "name": "hoje e tempo de louvar",
+                    "path": "./letras/Letras/10 - Final/hoje_e_tempo_de_louvar.pdf"
+                },
+                {
+                    "name": "Mostra-me senhor",
+                    "path": "./letras/Letras/10 - Final/Mostra-me senhor.jpeg"
+                },
+                {
+                    "name": "pelas estradas da vida",
+                    "path": "./letras/Letras/10 - Final/pelas_estradas_da_vida.pdf"
+                },
+                {
+                    "name": "segura na mao de deus",
+                    "path": "./letras/Letras/10 - Final/segura_na_mao_de_deus.pdf"
+                },
+                {
+                    "name": "tomado pela mao",
+                    "path": "./letras/Letras/10 - Final/tomado_pela_mao.pdf"
+                },
+                {
+                    "name": "tu es razao jornada",
+                    "path": "./letras/Letras/10 - Final/tu_es_razao_jornada.pdf"
+                }
+            ],
+            "Abraço de Paz": [
+                {
+                    "name": "esteja sempre com voce",
+                    "path": "./letras/Letras/Abraço de Paz/esteja_sempre_com_voce.pdf"
+                },
+                {
+                    "name": "irmao minha paz eu te dou",
+                    "path": "./letras/Letras/Abraço de Paz/irmao_minha_paz_eu_te_dou.pdf"
+                },
+                {
+                    "name": "paz paz de cristo",
+                    "path": "./letras/Letras/Abraço de Paz/paz_paz_de_cristo.pdf"
+                }
+            ],
+            "Ação de graças": [
+                {
+                    "name": "deus esta aqui",
+                    "path": "./letras/Letras/Ação de graças/deus_esta_aqui.pdf"
+                },
+                {
+                    "name": "e impossivel nao crer em ti",
+                    "path": "./letras/Letras/Ação de graças/e_impossivel_nao_crer_em_ti.pdf"
+                },
+                {
+                    "name": "espirito santo",
+                    "path": "./letras/Letras/Ação de graças/espirito_santo.pdf"
+                },
+                {
+                    "name": "obrigado senhor",
+                    "path": "./letras/Letras/Ação de graças/obrigado_senhor.pdf"
+                }
+            ],
+            "Cantos Marianos": [
+                {
+                    "name": "a escolhida",
+                    "path": "./letras/Letras/Cantos Marianos/a_escolhida.pdf"
+                },
+                {
+                    "name": "ave cheia de graca",
+                    "path": "./letras/Letras/Cantos Marianos/ave_cheia_de_graca.pdf"
+                },
+                {
+                    "name": "imaculada maria de deus",
+                    "path": "./letras/Letras/Cantos Marianos/imaculada_maria_de_deus.pdf"
+                },
+                {
+                    "name": "maria de nazare",
+                    "path": "./letras/Letras/Cantos Marianos/maria_de_nazare.pdf"
+                },
+                {
+                    "name": "santa mae maria",
+                    "path": "./letras/Letras/Cantos Marianos/santa_mae_maria.pdf"
+                },
+                {
+                    "name": "santa maria vem",
+                    "path": "./letras/Letras/Cantos Marianos/santa_maria_vem.pdf"
+                }
+            ],
+            "Diversos": [
+                {
+                    "name": "podes reinar",
+                    "path": "./letras/Letras/Diversos/podes_reinar.pdf"
+                },
+                {
+                    "name": "prova de amor",
+                    "path": "./letras/Letras/Diversos/prova_de_amor.pdf"
+                },
+                {
+                    "name": "Quando quero falar com Deus",
+                    "path": "./letras/Letras/Diversos/Quando quero falar com Deus.jpeg"
+                },
+                {
+                    "name": "É tão lindo falar com Deus",
+                    "path": "./letras/Letras/Diversos/É tão lindo falar com Deus.jpeg"
+                }
+            ],
+            "Louvor e Meditação": [
+                {
+                    "name": "a alegria esta no coracao",
+                    "path": "./letras/Letras/Louvor e Meditação/a_alegria_esta_no_coracao.pdf"
+                },
+                {
+                    "name": "a nos descei divina luz",
+                    "path": "./letras/Letras/Louvor e Meditação/a_nos_descei_divina_luz.pdf"
+                },
+                {
+                    "name": "agua viva",
+                    "path": "./letras/Letras/Louvor e Meditação/agua_viva.pdf"
+                },
+                {
+                    "name": "amar como jesus amou",
+                    "path": "./letras/Letras/Louvor e Meditação/amar_como_jesus_amou.pdf"
+                },
+                {
+                    "name": "bate o sino",
+                    "path": "./letras/Letras/Louvor e Meditação/bate_o_sino.pdf"
+                },
+                {
+                    "name": "Desamarrem as sandálias",
+                    "path": "./letras/Letras/Louvor e Meditação/Desamarrem_as_sandálias.pdf"
+                },
+                {
+                    "name": "eu louvarei",
+                    "path": "./letras/Letras/Louvor e Meditação/eu_louvarei.pdf"
+                },
+                {
+                    "name": "eu quero um rio",
+                    "path": "./letras/Letras/Louvor e Meditação/eu_quero_um_rio.pdf"
+                },
+                {
+                    "name": "louvado seja o meu senhor",
+                    "path": "./letras/Letras/Louvor e Meditação/louvado_seja_o_meu_senhor.pdf"
+                },
+                {
+                    "name": "meu mestre a minha vida e do mestre",
+                    "path": "./letras/Letras/Louvor e Meditação/meu_mestre__a_minha_vida_e_do_mestre.pdf"
+                },
+                {
+                    "name": "noite feliz",
+                    "path": "./letras/Letras/Louvor e Meditação/noite_feliz.pdf"
+                },
+                {
+                    "name": "noites traicoeiras",
+                    "path": "./letras/Letras/Louvor e Meditação/noites_traicoeiras.pdf"
+                },
+                {
+                    "name": "oracao da familia",
+                    "path": "./letras/Letras/Louvor e Meditação/oracao_da_familia.pdf"
+                },
+                {
+                    "name": "oracao de sao francisco",
+                    "path": "./letras/Letras/Louvor e Meditação/oracao_de_sao_francisco.pdf"
+                },
+                {
+                    "name": "podes reinar",
+                    "path": "./letras/Letras/Louvor e Meditação/podes_reinar.pdf"
+                },
+                {
+                    "name": "quao grande es tu",
+                    "path": "./letras/Letras/Louvor e Meditação/quao_grande_es_tu.pdf"
+                },
+                {
+                    "name": "segura na mao de deus",
+                    "path": "./letras/Letras/Louvor e Meditação/segura_na_mao_de_deus.pdf"
+                },
+                {
+                    "name": "tao sublime",
+                    "path": "./letras/Letras/Louvor e Meditação/tao_sublime.pdf"
+                },
+                {
+                    "name": "vou cantar teu amor",
+                    "path": "./letras/Letras/Louvor e Meditação/vou-cantar-teu-amor.pdf"
+                }
+            ]
+        };
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+            loadCategories();
+            setupModal();
+            setupSearch();
+            setupMissaHoje();
+        });
+
+        // Create floating particles effect
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 50;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (Math.random() * 3 + 3) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Load and display categories
+        function loadCategories() {
+            const categoriesGrid = document.getElementById('categoriesGrid');
+            categoriesGrid.innerHTML = '';
+
+            Object.keys(lyricsData).forEach((category, index) => {
+                const songs = lyricsData[category];
+                const categoryCard = createCategoryCard(category, songs, index);
+                categoriesGrid.appendChild(categoryCard);
+            });
+        }
+
+        // Create category card
+        function createCategoryCard(categoryName, songs, index) {
+            const card = document.createElement('div');
+            card.className = 'category-card';
+            card.innerHTML = `
+                <div class="category-title">
+                    <div class="category-icon">${index + 1}</div>
+                    ${categoryName}
+                    <div class="song-count">${songs.length}</div>
+                </div>
+                <div class="songs-list">
+                    ${songs.map(song => {
+                        const fileExtension = song.path.split('.').pop().toLowerCase();
+                        const isImage = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(fileExtension);
+                        return `
+                            <div class="song-item draggable" 
+                                 draggable="true" 
+                                 data-song-name="${song.name}" 
+                                 data-song-path="${song.path}" 
+                                 data-song-category="${categoryName}"
+                                 onclick="openFile('${song.path}', '${song.name}')"
+                                 ondragstart="handleDragStart(event)"
+                                 ondragend="handleDragEnd(event)">
+                                <div class="song-icon">${isImage ? '🖼️' : '♪'}</div>
+                                <div class="song-name">${song.name}</div>
+                                <div class="file-type-indicator">${fileExtension.toUpperCase()}</div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+
+            // Add click event to toggle category
+            card.addEventListener('click', function(e) {
+                if (!e.target.closest('.song-item')) {
+                    card.classList.toggle('expanded');
+                }
+            });
+
+            return card;
+        }
+
+        // Missa de hoje functionality
+        let missaSongs = [];
+
+        // Toggle Missa de hoje visibility
+        function toggleMissaHoje() {
+            const container = document.getElementById('missaHojeContainer');
+            container.classList.toggle('hidden');
+        }
+
+        // Drag and drop handlers
+        function handleDragStart(event) {
+            event.stopPropagation();
+            event.dataTransfer.setData('text/plain', JSON.stringify({
+                name: event.target.dataset.songName,
+                path: event.target.dataset.songPath,
+                category: event.target.dataset.songCategory
+            }));
+            event.target.classList.add('dragging');
+        }
+
+        function handleDragEnd(event) {
+            event.target.classList.remove('dragging');
+        }
+
+        function handleDragOver(event) {
+            event.preventDefault();
+            event.dataTransfer.dropEffect = 'copy';
+        }
+
+        function handleDragEnter(event) {
+            event.preventDefault();
+            event.target.classList.add('drag-over');
+        }
+
+        function handleDragLeave(event) {
+            event.target.classList.remove('drag-over');
+        }
+
+        function handleDrop(event) {
+            event.preventDefault();
+            event.target.classList.remove('drag-over');
+            
+            try {
+                const songData = JSON.parse(event.dataTransfer.getData('text/plain'));
+                addSongToMissa(songData);
+            } catch (error) {
+                console.error('Erro ao processar drop:', error);
+            }
+        }
+
+        // Add song to Missa de hoje
+        function addSongToMissa(songData) {
+            // Check if song already exists
+            if (missaSongs.find(song => song.name === songData.name)) {
+                return; // Song already in list
+            }
+
+            missaSongs.push(songData);
+            updateMissaDisplay();
+        }
+
+        // Remove song from Missa de hoje
+        function removeSongFromMissa(songName) {
+            missaSongs = missaSongs.filter(song => song.name !== songName);
+            updateMissaDisplay();
+        }
+
+        // Update Missa de hoje display
+        function updateMissaDisplay() {
+            const dropZone = document.getElementById('missaDropZone');
+            
+            if (missaSongs.length === 0) {
+                dropZone.className = 'missa-drop-zone empty';
+                dropZone.innerHTML = `
+                    <div>📋</div>
+                    <div>Arraste os cânticos aqui</div>
+                    <div style="font-size: 0.8rem; margin-top: 5px;">para organizar a missa</div>
+                `;
+            } else {
+                dropZone.className = 'missa-drop-zone';
+                dropZone.innerHTML = missaSongs.map((song, index) => `
+                    <div class="missa-song-item" onclick="openFile('${song.path}', '${song.name}')">
+                        <div class="missa-song-name">${song.name}</div>
+                        <div class="missa-song-category">${song.category}</div>
+                        <button class="remove-song-btn" onclick="event.stopPropagation(); removeSongFromMissa('${song.name}')" title="Remover">×</button>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Clear all songs from Missa de hoje
+        function clearMissa() {
+            if (missaSongs.length > 0 && confirm('Tem certeza que deseja limpar todos os cânticos da missa?')) {
+                missaSongs = [];
+                updateMissaDisplay();
+            }
+        }
+
+        // Save Missa de hoje (could be extended to save to localStorage or export)
+        function saveMissa() {
+            if (missaSongs.length === 0) {
+                alert('Adicione alguns cânticos antes de salvar.');
+                return;
+            }
+
+            // Save to localStorage
+            localStorage.setItem('missaDeHoje', JSON.stringify(missaSongs));
+            alert('Missa salva com sucesso!');
+        }
+
+        // Load saved Missa de hoje
+        function loadSavedMissa() {
+            try {
+                const saved = localStorage.getItem('missaDeHoje');
+                if (saved) {
+                    missaSongs = JSON.parse(saved);
+                    updateMissaDisplay();
+                }
+            } catch (error) {
+                console.error('Erro ao carregar missa salva:', error);
+            }
+        }
+
+        // Setup Missa de hoje functionality
+        function setupMissaHoje() {
+            const toggle = document.getElementById('missaToggle');
+            const dropZone = document.getElementById('missaDropZone');
+
+            // Toggle button event
+            toggle.addEventListener('click', toggleMissaHoje);
+
+            // Drop zone events
+            dropZone.addEventListener('dragover', handleDragOver);
+            dropZone.addEventListener('dragenter', handleDragEnter);
+            dropZone.addEventListener('dragleave', handleDragLeave);
+            dropZone.addEventListener('drop', handleDrop);
+
+            // Load saved missa
+            loadSavedMissa();
+        }
+
+        // Setup modal functionality
+        function setupModal() {
+            const modal = document.getElementById('fileModal');
+            const closeBtn = document.getElementById('closeModal');
+
+            closeBtn.addEventListener('click', function() {
+                modal.style.display = 'none';
+                document.getElementById('pdfViewer').src = '';
+                document.getElementById('imageContent').src = '';
+            });
+
+            window.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                    document.getElementById('pdfViewer').src = '';
+                    document.getElementById('imageContent').src = '';
+                }
+            });
+
+            // Close modal with Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && modal.style.display === 'block') {
+                    modal.style.display = 'none';
+                    document.getElementById('pdfViewer').src = '';
+                    document.getElementById('imageContent').src = '';
+                }
+            });
+        }
+
+        // Open file (PDF or Image) in modal
+        function openFile(filePath, fileName) {
+            const modal = document.getElementById('fileModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const pdfViewer = document.getElementById('pdfViewer');
+            const imageViewer = document.getElementById('imageViewer');
+            const imageContent = document.getElementById('imageContent');
+
+            modalTitle.textContent = fileName;
+            
+            // Determine file type
+            const fileExtension = filePath.split('.').pop().toLowerCase();
+            const isImage = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(fileExtension);
+
+            if (isImage) {
+                // Show image viewer
+                pdfViewer.style.display = 'none';
+                imageViewer.style.display = 'flex';
+                imageContent.src = filePath;
+                imageContent.alt = fileName;
+            } else {
+                // Show PDF viewer
+                imageViewer.style.display = 'none';
+                pdfViewer.style.display = 'block';
+                pdfViewer.src = filePath;
+            }
+
+            modal.style.display = 'block';
+
+            // Add loading state for PDFs
+            if (!isImage) {
+                pdfViewer.onload = function() {
+                    console.log('PDF loaded successfully');
+                };
+
+                pdfViewer.onerror = function() {
+                    modalTitle.textContent = 'Erro ao carregar arquivo: ' + fileName;
+                    pdfViewer.src = 'data:text/html,<html><body style="font-family: Arial; padding: 20px; text-align: center;"><h2>Erro ao carregar o arquivo</h2><p>O arquivo não pôde ser carregado. Verifique se o caminho está correto.</p></body></html>';
+                };
+            }
+        }
+
+        // Setup search functionality
+        function setupSearch() {
+            const searchInput = document.getElementById('searchInput');
+            const searchResults = document.getElementById('searchResults');
+            let searchTimeout;
+
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                const query = this.value.trim().toLowerCase();
+
+                if (query.length < 2) {
+                    searchResults.classList.remove('active');
+                    return;
+                }
+
+                searchTimeout = setTimeout(() => {
+                    performSearch(query);
+                }, 300);
+            });
+
+            // Hide search results when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.search-container')) {
+                    searchResults.classList.remove('active');
+                }
+            });
+        }
+
+        // Perform search across all songs
+        function performSearch(query) {
+            const searchResults = document.getElementById('searchResults');
+            const results = [];
+
+            // Search through all categories and songs
+            Object.keys(lyricsData).forEach(category => {
+                lyricsData[category].forEach(song => {
+                    if (song.name.toLowerCase().includes(query)) {
+                        results.push({
+                            name: song.name,
+                            path: song.path,
+                            category: category
+                        });
+                    }
+                });
+            });
+
+            displaySearchResults(results);
+        }
+
+        // Display search results
+        function displaySearchResults(results) {
+            const searchResults = document.getElementById('searchResults');
+
+            if (results.length === 0) {
+                searchResults.innerHTML = '<div style="text-align: center; color: rgba(255,255,255,0.6); padding: 10px;">Nenhuma música encontrada</div>';
+            } else {
+                searchResults.innerHTML = results.slice(0, 10).map(result => `
+                    <div class="search-result-item" onclick="openFile('${result.path}', '${result.name}')">
+                        <div class="search-result-name">${result.name}</div>
+                        <div class="search-result-category">${result.category}</div>
+                    </div>
+                `).join('');
+
+                if (results.length > 10) {
+                    searchResults.innerHTML += `<div style="text-align: center; color: rgba(255,255,255,0.6); padding: 10px; font-size: 0.9rem;">E mais ${results.length - 10} resultado(s)...</div>`;
+                }
+            }
+
+            searchResults.classList.add('active');
+        }
+
+        // Enhanced search with category filtering
+        function searchInCategory(categoryName, query) {
+            const category = lyricsData[categoryName];
+            if (!category) return [];
+
+            return category.filter(song => 
+                song.name.toLowerCase().includes(query.toLowerCase())
+            );
+        }
+
+        // Clear search
+        function clearSearch() {
+            const searchInput = document.getElementById('searchInput');
+            const searchResults = document.getElementById('searchResults');
+            
+            searchInput.value = '';
+            searchResults.classList.remove('active');
+        }
+    </script>
+</body>
+</html>
+
