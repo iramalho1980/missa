@@ -13,7 +13,7 @@
             <h1>E-Missa: Organização de Cânticos</h1>
             <input type="text" id="search-input" placeholder="Pesquisar cântico...">
         </header>
-        
+
         <main>
             <section id="canticos-section">
                 <h2>Relação de Cânticos</h2>
@@ -24,26 +24,51 @@
 
             <section id="missa-section">
                 <h2>Missa</h2>
+                <div class="missa-controls">
+                    <button id="load-missa">Carregar Missa Salva</button>
+                    <button id="clear-missa">Limpar Missa</button>
+                </div>
                 <div id="missa-order" class="drop-zone">
                     <!-- Cânticos da missa serão arrastados para cá -->
                 </div>
                 <button id="save-missa">Salvar Ordem da Missa</button>
             </section>
         </main>
-    </div>
 
-    <div id="popup" class="popup-container">
-        <div class="popup-content">
-            <span class="close-button">&times;</span>
-            <iframe id="pdf-viewer" src="" frameborder="0"></iframe>
+        <!-- Popup para visualizar PDFs/imagens -->
+        <div id="popup" class="popup-container">
+            <div class="popup-content">
+                <span class="close-button">&times;</span>
+                <iframe id="pdf-viewer" src="" frameborder="0"></iframe>
+            </div>
         </div>
-    </div>
+
+        <!-- Popup para resultados de pesquisa -->
+        <div id="search-results-popup" class="popup-container">
+            <div id="search-results-content" class="popup-content">
+                <span id="search-results-close" class="close-button">&times;</span>
+                <h3>Resultados da Pesquisa</h3>
+                <div id="search-results-list">
+                    <!-- Resultados da pesquisa aparecerão aqui -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Popup para carregar missas salvas -->
+        <div id="load-missa-popup" class="popup-container">
+            <div id="load-missa-content" class="popup-content">
+                <span id="load-missa-close" class="close-button">&times;</span>
+                <h3>Carregar Missa Salva</h3>
+                <div id="saved-missas-list">
+                    <!-- Lista de missas salvas aparecerá aqui -->
+                </div>
+            </div>
+        </div>
 
     <script src="script.js"></script>
     <script src="github-integration.js"></script>
 </body>
 </html>
-
 
 <!-- Forcing GitHub Pages rebuild -->
 
