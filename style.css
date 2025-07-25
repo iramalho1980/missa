@@ -372,3 +372,31 @@ h2 {
     background: linear-gradient(45deg, #ffffff, #ffff00);
 }
 
+
+
+.cantico-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.add-to-missa-btn {
+    background: #ffff00;
+    color: #000000;
+    border: none;
+    border-radius: 5px;
+    width: 25px;
+    height: 25px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0; /* Evita que o botão encolha */
+    margin-left: 10px;
+}
+
+.add-to-missa-btn:hover {
+    background: #ffffff;
+    transform: scale(1.1);
+}
+
+

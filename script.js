@@ -238,6 +238,16 @@ function createCanticoItem(canticoFile, category) {
     item.dataset.file = canticoFile;
     item.dataset.category = category;
     
+    const addButton = document.createElement('button');
+    addButton.className = 'add-to-missa-btn';
+    addButton.innerHTML = '+';
+    addButton.onclick = (e) => {
+        e.stopPropagation(); // Evita que o clique no botão abra o PDF
+        addToMissa({ file: canticoFile, category: category, name: canticoName });
+    };
+    
+    item.appendChild(addButton);
+    
     // Event listeners para drag and drop
     item.addEventListener('dragstart', handleDragStart);
     item.addEventListener('dragend', handleDragEnd);
