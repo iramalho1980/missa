@@ -138,6 +138,10 @@
             box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
         }
         
+        .card.hidden {
+            display: none;
+        }
+        
         .card-header {
             display: flex;
             justify-content: space-between;
@@ -173,7 +177,7 @@
         }
         
         .card-content.expanded {
-            max-height: 500px;
+            max-height: 1000px;
         }
         
         .card ul {
@@ -193,6 +197,7 @@
             text-decoration: none;
             font-size: 1.1rem;
             transition: color 0.2s ease;
+            cursor: pointer;
         }
         
         .card ul li a:hover {
@@ -216,6 +221,8 @@
             font-size: 0.9rem;
             transition: all 0.3s ease;
             align-self: flex-start;
+            cursor: pointer;
+            border: none;
         }
         
         .card .view-all:hover {
@@ -231,6 +238,80 @@
             color: rgba(255, 255, 255, 0.7);
             font-size: 0.9rem;
         }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+
+        .modal-content {
+            position: relative;
+            margin: 2% auto;
+            width: 90%;
+            height: 90%;
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            background: #333;
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        .close:hover {
+            color: #fff;
+        }
+
+        .modal-body {
+            height: calc(100% - 70px);
+            padding: 0;
+        }
+
+        .modal-body iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .modal-body img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #f0f0f0;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.2rem;
+        }
     </style>
 </head>
 <body>
@@ -239,344 +320,137 @@
             <h1>Letras de Música</h1>
             <p>Seu portal para as mais belas letras de cânticos religiosos.</p>
             <div class="search-container">
-                <input placeholder="Buscar cânticos..." type="text">
+                <input id="searchInput" placeholder="Buscar cânticos..." type="text">
             </div>
             <nav class="category-navigation">
-                <button class="active">Todos</button>
-                <button>Entrada</button>
-                <button>Ato Penitencial</button>
-                <button>Glória</button>
-                <button>Aclamação</button>
-                <button>Ofertas</button>
-                <button>Santo</button>
-                <button>Paz</button>
-                <button>Cordeiro</button>
-                <button>Comunhão</button>
-                <button>Pós-Comunhão</button>
-                <button>Final</button>
-                <button>Nossa Senhora</button>
-                <button>Adoração</button>
-                <button>Espírito Santo</button>
-                <button>Natal</button>
-                <button>Quarema</button>
-                <button>Páscoa</button>
-                <button>Pentecostes</button>
-                <button>Outros</button>
+                <button class="active" data-category="Todos">Todos</button>
+                <button data-category="Entrada">Entrada</button>
+                <button data-category="Ato Penitencial">Ato Penitencial</button>
+                <button data-category="Glória">Glória</button>
+                <button data-category="Aclamação">Aclamação</button>
+                <button data-category="Ofertas">Ofertas</button>
+                <button data-category="Santo">Santo</button>
+                <button data-category="Paz">Paz</button>
+                <button data-category="Cordeiro">Cordeiro</button>
+                <button data-category="Comunhão">Comunhão</button>
+                <button data-category="Pós-Comunhão">Pós-Comunhão</button>
+                <button data-category="Final">Final</button>
+                <button data-category="Nossa Senhora">Nossa Senhora</button>
+                <button data-category="Adoração">Adoração</button>
+                <button data-category="Espírito Santo">Espírito Santo</button>
+                <button data-category="Natal">Natal</button>
+                <button data-category="Quarema">Quarema</button>
+                <button data-category="Páscoa">Páscoa</button>
+                <button data-category="Pentecostes">Pentecostes</button>
+                <button data-category="Outros">Outros</button>
             </nav>
         </header>
         
-        <main class="content-grid">
-            <div class="card">
-                <div class="card-header" onclick="toggleCard(this)">
-                    <h2>Cânticos de Entrada</h2>
-                    <button class="toggle-btn collapsed">▼</button>
-                </div>
-                <div class="card-content">
-                    <ul>
-                        <li><a href="#">Alegres Vamos</a></li>
-                        <li><a href="#">Senhor, Eis Aqui o Teu Povo</a></li>
-                        <li><a href="#">Vem, Vem Louvar</a></li>
-                        <li><a href="#">Alegrai-vos Sempre no Senhor</a></li>
-                    </ul>
-                    <a class="view-all" href="#">Ver Todos</a>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-header" onclick="toggleCard(this)">
-                    <h2>Cânticos para o Ato Penitencial</h2>
-                    <button class="toggle-btn collapsed">▼</button>
-                </div>
-                <div class="card-content">
-                    <ul>
-                        <li><a href="#">Senhor, Que Viestes Salvar</a></li>
-                        <li><a href="#">Perdão, Senhor</a></li>
-                        <li><a href="#">Tende Piedade</a></li>
-                        <li><a href="#">Kyrie Eleison (Pelos Pecados)</a></li>
-                    </ul>
-                    <a class="view-all" href="#">Ver Todos</a>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-header" onclick="toggleCard(this)">
-                    <h2>Cânticos para o Glória</h2>
-                    <button class="toggle-btn collapsed">▼</button>
-                </div>
-                <div class="card-content">
-                    <ul>
-                        <li><a href="#">Glória a Deus nas Alturas</a></li>
-                        <li><a href="#">Glória, Glória, Anjos no Céu</a></li>
-                        <li><a href="#">A Ti, Senhor, Glória e Louvor</a></li>
-                        <li><a href="#">Glória a Deus nas Alturas (Versão Nova)</a></li>
-                    </ul>
-                    <a class="view-all" href="#">Ver Todos</a>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-header" onclick="toggleCard(this)">
-                    <h2>Cânticos para Aclamação ao Evangelho</h2>
-                    <button class="toggle-btn collapsed">▼</button>
-                </div>
-                <div class="card-content">
-                    <ul>
-                        <li><a href="#">Aleluia! Quando Estamos Juntos</a></li>
-                        <li><a href="#">Aleluia! Como o Pai Me Amou</a></li>
-                        <li><a href="#">Fala, Senhor</a></li>
-                        <li><a href="#">Aleluia! Tua Palavra é Luz</a></li>
-                    </ul>
-                    <a class="view-all" href="#">Ver Todos</a>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-header" onclick="toggleCard(this)">
-                    <h2>Cânticos para as Ofertas</h2>
-                    <button class="toggle-btn collapsed">▼</button>
-                </div>
-                <div class="card-content">
-                    <ul>
-                        <li><a href="#">Bendito Sejas, Senhor</a></li>
-                        <li><a href="#">Um Coração Para Amar</a></li>
-                        <li><a href="#">Aceita, Senhor</a></li>
-                        <li><a href="#">Ofertar Nossa Vida</a></li>
-                    </ul>
-                    <a class="view-all" href="#">Ver Todos</a>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-header" onclick="toggleCard(this)">
-                    <h2>Cânticos para o Santo</h2>
-                    <button class="toggle-btn collapsed">▼</button>
-                </div>
-                <div class="card-content">
-                    <ul>
-                        <li><a href="#">Santo, Santo, Santo é o Senhor</a></li>
-                        <li><a href="#">Santo é o Senhor Deus do Universo</a></li>
-                        <li><a href="#">Aclamação de Louvor</a></li>
-                        <li><a href="#">Santo é o Senhor (Com Aclamação)</a></li>
-                    </ul>
-                    <a class="view-all" href="#">Ver Todos</a>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-header" onclick="toggleCard(this)">
-                    <h2>Cânticos para o Abraço da Paz</h2>
-                    <button class="toggle-btn collapsed">▼</button>
-                </div>
-                <div class="card-content">
-                    <ul>
-                        <li><a href="#">A Paz Esteja Convosco</a></li>
-                        <li><a href="#">Aperte a Mão do Seu Irmão</a></li>
-                        <li><a href="#">Paz de Cristo</a></li>
-                        <li><a href="#">Dona Nobis Pacem</a></li>
-                    </ul>
-                    <a class="view-all" href="#">Ver Todos</a>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-header" onclick="toggleCard(this)">
-                    <h2>Cânticos para o Cordeiro de Deus</h2>
-                    <button class="toggle-btn collapsed">▼</button>
-                </div>
-                <div class="card-content">
-                    <ul>
-                        <li><a href="#">Cordeiro de Deus, Que Tirais</a></li>
-                        <li><a href="#">Cordeiro de Deus (Hino)</a></li>
-                        <li><a href="#">Ó Cordeiro de Deus</a></li>
-                        <li><a href="#">Cordeiro de Deus (Comunidade Católica Shalom)</a></li>
-                    </ul>
-                    <a class="view-all" href="#">Ver Todos</a>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-header" onclick="toggleCard(this)">
-                    <h2>Cânticos de Comunhão</h2>
-                    <button class="toggle-btn collapsed">▼</button>
-                </div>
-                <div class="card-content">
-                    <ul>
-                        <li><a href="#">Prova de Amor</a></li>
-                        <li><a href="#">O Pão da Vida</a></li>
-                        <li><a href="#">Comungar</a></li>
-                        <li><a href="#">O Corpo de Cristo</a></li>
-                    </ul>
-                    <a class="view-all" href="#">Ver Todos</a>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-header" onclick="toggleCard(this)">
-                    <h2>Cânticos Pós-Comunhão</h2>
-                    <button class="toggle-btn collapsed">▼</button>
-                </div>
-                <div class="card-content">
-                    <ul>
-                        <li><a href="#">Mestre, Onde Moras?</a></li>
-                        <li><a href="#">Um Novo Mandamento</a></li>
-                        <li><a href="#">Eu Vos Escolhi</a></li>
-                        <li><a href="#">Alma de Cristo</a></li>
-                    </ul>
-                    <a class="view-all" href="#">Ver Todos</a>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-header" onclick="toggleCard(this)">
-                    <h2>Cânticos Finais</h2>
-                    <button class="toggle-btn collapsed">▼</button>
-                </div>
-                <div class="card-content">
-                    <ul>
-                        <li><a href="#">Pelos Prados e Campinas</a></li>
-                        <li><a href="#">Ide Por Todo o Mundo</a></li>
-                        <li><a href="#">Ninguém Te Ama Como Eu</a></li>
-                        <li><a href="#">Te Amarei, Senhor</a></li>
-                    </ul>
-                    <a class="view-all" href="#">Ver Todos</a>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-header" onclick="toggleCard(this)">
-                    <h2>Cânticos para Nossa Senhora</h2>
-                    <button class="toggle-btn collapsed">▼</button>
-                </div>
-                <div class="card-content">
-                    <ul>
-                        <li><a href="#">Maria de Nazaré</a></li>
-                        <li><a href="#">Consagração a Nossa Senhora</a></li>
-                        <li><a href="#">Senhora e Rainha</a></li>
-                        <li><a href="#">Consagração a Nossa Senhora Aparecida</a></li>
-                    </ul>
-                    <a class="view-all" href="#">Ver Todos</a>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-header" onclick="toggleCard(this)">
-                    <h2>Cânticos de Adoração</h2>
-                    <button class="toggle-btn collapsed">▼</button>
-                </div>
-                <div class="card-content">
-                    <ul>
-                        <li><a href="#">Tão Sublime Sacramento</a></li>
-                        <li><a href="#">Adoramos o Santíssimo</a></li>
-                        <li><a href="#">Jesus Eucarístico</a></li>
-                        <li><a href="#">Eu Te Adoro, Ó Hóstia Divina</a></li>
-                    </ul>
-                    <a class="view-all" href="#">Ver Todos</a>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-header" onclick="toggleCard(this)">
-                    <h2>Cânticos ao Espírito Santo</h2>
-                    <button class="toggle-btn collapsed">▼</button>
-                </div>
-                <div class="card-content">
-                    <ul>
-                        <li><a href="#">Vem, Espírito Santo</a></li>
-                        <li><a href="#">Sopro de Deus</a></li>
-                        <li><a href="#">Espírito, Enche a Minha Vida</a></li>
-                        <li><a href="#">Vem, Espírito Santo, Vem</a></li>
-                    </ul>
-                    <a class="view-all" href="#">Ver Todos</a>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-header" onclick="toggleCard(this)">
-                    <h2>Cânticos de Natal</h2>
-                    <button class="toggle-btn collapsed">▼</button>
-                </div>
-                <div class="card-content">
-                    <ul>
-                        <li><a href="#">Noite Feliz</a></li>
-                        <li><a href="#">Nasceu o Salvador</a></li>
-                        <li><a href="#">Um Novo Tempo</a></li>
-                        <li><a href="#">Boas Novas de Natal</a></li>
-                    </ul>
-                    <a class="view-all" href="#">Ver Todos</a>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-header" onclick="toggleCard(this)">
-                    <h2>Cânticos para a Quaresma</h2>
-                    <button class="toggle-btn collapsed">▼</button>
-                </div>
-                <div class="card-content">
-                    <ul>
-                        <li><a href="#">Convertei-nos, Senhor</a></li>
-                        <li><a href="#">Senhor, Se Tu Me Chamas</a></li>
-                        <li><a href="#">Jesus Cristo Ontem, Hoje e Sempre</a></li>
-                        <li><a href="#">Misericórdia, Senhor</a></li>
-                    </ul>
-                    <a class="view-all" href="#">Ver Todos</a>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-header" onclick="toggleCard(this)">
-                    <h2>Cânticos para a Páscoa</h2>
-                    <button class="toggle-btn collapsed">▼</button>
-                </div>
-                <div class="card-content">
-                    <ul>
-                        <li><a href="#">Cristo Ressuscitou</a></li>
-                        <li><a href="#">Aleluia! Minha Alma Canta</a></li>
-                        <li><a href="#">Vitória, Tu Reinarás</a></li>
-                        <li><a href="#">Jesus Cristo Ressuscitou (Aleluia)</a></li>
-                    </ul>
-                    <a class="view-all" href="#">Ver Todos</a>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-header" onclick="toggleCard(this)">
-                    <h2>Cânticos para Pentecostes</h2>
-                    <button class="toggle-btn collapsed">▼</button>
-                </div>
-                <div class="card-content">
-                    <ul>
-                        <li><a href="#">Vem, Vem, Espírito de Deus</a></li>
-                        <li><a href="#">Fogo Suave</a></li>
-                        <li><a href="#">Renova-me, Senhor</a></li>
-                        <li><a href="#">Vem, Fogo Renovador</a></li>
-                    </ul>
-                    <a class="view-all" href="#">Ver Todos</a>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-header" onclick="toggleCard(this)">
-                    <h2>Outros Cânticos</h2>
-                    <button class="toggle-btn collapsed">▼</button>
-                </div>
-                <div class="card-content">
-                    <ul>
-                        <li><a href="#">Pelos Caminhos da Vida</a></li>
-                        <li><a href="#">Minha Vida Tem Sentido</a></li>
-                        <li><a href="#">Deus Trino</a></li>
-                        <li><a href="#">Exaltado Seja o Senhor</a></li>
-                    </ul>
-                    <a class="view-all" href="#">Ver Todos</a>
-                </div>
-            </div>
+        <main class="content-grid" id="contentGrid">
+            <!-- Cards serão gerados dinamicamente pelo JavaScript -->
         </main>
+
+        <div class="no-results" id="noResults" style="display: none;">
+            <p>Nenhum cântico encontrado para sua busca.</p>
+        </div>
         
         <footer class="footer">
             <p>&copy; 2023 Letras de Música. Todos os direitos reservados.</p>
         </footer>
     </div>
+
+    <!-- Modal para exibir PDFs e imagens -->
+    <div id="canticoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Cântico</h3>
+                <button class="close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Conteúdo será inserido dinamicamente -->
+            </div>
+        </div>
+    </div>
     
     <script>
+        let canticosData = {};
+        let currentCategory = 'Todos';
+        let searchTerm = '';
+
+        // Carregar dados dos cânticos
+        async function loadCanticosData() {
+            try {
+                const response = await fetch('canticos_data.json');
+                canticosData = await response.json();
+                renderCards();
+            } catch (error) {
+                console.error('Erro ao carregar dados dos cânticos:', error);
+            }
+        }
+
+        // Renderizar cards
+        function renderCards() {
+            const contentGrid = document.getElementById('contentGrid');
+            const noResults = document.getElementById('noResults');
+            contentGrid.innerHTML = '';
+            
+            let hasVisibleCards = false;
+
+            for (const [category, canticos] of Object.entries(canticosData)) {
+                if (canticos.length === 0) continue;
+                
+                // Filtrar por categoria
+                if (currentCategory !== 'Todos' && category !== currentCategory) {
+                    continue;
+                }
+
+                // Filtrar por busca
+                let filteredCanticos = canticos;
+                if (searchTerm) {
+                    filteredCanticos = canticos.filter(cantico => 
+                        cantico.name.toLowerCase().includes(searchTerm.toLowerCase())
+                    );
+                }
+
+                if (filteredCanticos.length === 0) continue;
+
+                hasVisibleCards = true;
+
+                const card = createCard(category, filteredCanticos);
+                contentGrid.appendChild(card);
+            }
+
+            noResults.style.display = hasVisibleCards ? 'none' : 'block';
+        }
+
+        // Criar card
+        function createCard(category, canticos) {
+            const card = document.createElement('div');
+            card.className = 'card';
+            
+            const displayLimit = 4;
+            const displayCanticos = canticos.slice(0, displayLimit);
+            const hasMore = canticos.length > displayLimit;
+
+            card.innerHTML = `
+                <div class="card-header" onclick="toggleCard(this)">
+                    <h2>Cânticos ${category === 'Entrada' ? 'de' : category === 'Ato Penitencial' ? 'para o' : category === 'Glória' ? 'para o' : category === 'Aclamação' ? 'para' : category === 'Ofertas' ? 'para as' : category === 'Santo' ? 'para o' : category === 'Paz' ? 'para o Abraço da' : category === 'Cordeiro' ? 'para o Cordeiro de Deus' : category === 'Comunhão' ? 'de' : category === 'Pós-Comunhão' ? '' : category === 'Final' ? '' : category === 'Nossa Senhora' ? 'para' : category === 'Adoração' ? 'de' : category === 'Espírito Santo' ? 'ao' : category === 'Natal' ? 'de' : category === 'Quarema' ? 'para a' : category === 'Páscoa' ? 'para a' : category === 'Pentecostes' ? 'para' : ''} ${category}</h2>
+                    <button class="toggle-btn collapsed">▼</button>
+                </div>
+                <div class="card-content">
+                    <ul>
+                        ${displayCanticos.map(cantico => `
+                            <li><a onclick="openCantico('${cantico.path}', '${cantico.name}', '${cantico.type}')">${cantico.name}</a></li>
+                        `).join('')}
+                    </ul>
+                    ${hasMore ? `<button class="view-all" onclick="showAllCanticos('${category}')">Ver Todos (${canticos.length})</button>` : ''}
+                </div>
+            `;
+
+            return card;
+        }
+
+        // Toggle card
         function toggleCard(header) {
             const content = header.nextElementSibling;
             const toggleBtn = header.querySelector('.toggle-btn');
@@ -589,6 +463,85 @@
                 toggleBtn.classList.remove('collapsed');
             }
         }
+
+        // Mostrar todos os cânticos de uma categoria
+        function showAllCanticos(category) {
+            const canticos = canticosData[category];
+            const card = event.target.closest('.card');
+            const ul = card.querySelector('ul');
+            const viewAllBtn = card.querySelector('.view-all');
+
+            ul.innerHTML = canticos.map(cantico => `
+                <li><a onclick="openCantico('${cantico.path}', '${cantico.name}', '${cantico.type}')">${cantico.name}</a></li>
+            `).join('');
+
+            viewAllBtn.style.display = 'none';
+        }
+
+        // Abrir cântico no modal
+        function openCantico(path, name, type) {
+            const modal = document.getElementById('canticoModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+
+            modalTitle.textContent = name;
+
+            if (type === 'pdf') {
+                modalBody.innerHTML = `<iframe src="${path}" type="application/pdf"></iframe>`;
+            } else {
+                modalBody.innerHTML = `<img src="${path}" alt="${name}">`;
+            }
+
+            modal.style.display = 'block';
+        }
+
+        // Fechar modal
+        function closeModal() {
+            const modal = document.getElementById('canticoModal');
+            modal.style.display = 'none';
+        }
+
+        // Filtrar por categoria
+        function filterByCategory(category) {
+            currentCategory = category;
+            
+            // Atualizar botões ativos
+            document.querySelectorAll('.category-navigation button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            renderCards();
+        }
+
+        // Buscar cânticos
+        function searchCanticos() {
+            searchTerm = document.getElementById('searchInput').value;
+            renderCards();
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCanticosData();
+
+            // Busca
+            document.getElementById('searchInput').addEventListener('input', searchCanticos);
+
+            // Navegação por categoria
+            document.querySelectorAll('.category-navigation button').forEach(button => {
+                button.addEventListener('click', function() {
+                    filterByCategory(this.dataset.category);
+                });
+            });
+
+            // Fechar modal ao clicar fora
+            window.addEventListener('click', function(event) {
+                const modal = document.getElementById('canticoModal');
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+        });
     </script>
 </body>
 </html>
