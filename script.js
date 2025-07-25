@@ -42,7 +42,7 @@ canticosData = {
             'creio.jpeg',
             'tu_es_a_razao_da_jornada_novo.jpeg'
         ],
-        'Ato_Penitencial': [
+        'Ato Penitencial': [
             'conheco_um_coracao.pdf',
             'coracoes_arrependidos.pdf',
             'kyrie_eleison_jmj.pdf',
@@ -63,7 +63,7 @@ canticosData = {
             'gloria_a_deus_nas_alturas_novo.jpeg',
             'gloria_continuacao.jpeg'
         ],
-        'Aclamacao_Evangelho': [
+        'Aclamacao Evangelho': [
             'a_minhalma_abrirei.pdf',
             'a_vossa_palavra_senhor.pdf',
             'aleluia_como_o_pai_me_amou.pdf',
@@ -93,7 +93,7 @@ canticosData = {
             'santo_santo_e.pdf',
             'santo_santo_santo_eh_o_senhor_novo.jpeg'
         ],
-        'Abraco_de_Paz': [
+        'Abraco de Paz': [
             'esteja_sempre_com_voce.pdf',
             'irmao_minha_paz_eu_te_dou.pdf',
             'paz_paz_de_cristo.pdf'
@@ -138,7 +138,7 @@ canticosData = {
             'tomado_pela_mao.pdf',
             'tu_es_razao_jornada.pdf'
         ],
-        'Cantos_Marianos': [
+        'Cantos Marianos': [
             'a_escolhida.pdf',
             'ave_cheia_de_graca.pdf',
             'imaculada_maria_de_deus.pdf',
@@ -146,7 +146,7 @@ canticosData = {
             'santa_mae_maria.pdf',
             'santa_maria_vem.pdf'
         ],
-        'Louvor_e_Meditacao': [
+        'Louvor e Meditação': [
             'Desamarrem_as_sandálias.pdf',
             'a_alegria_esta_no_coracao.pdf',
             'a_nos_descei_divina_luz.pdf',
@@ -167,7 +167,7 @@ canticosData = {
             'tao_sublime.pdf',
             'vou-cantar-teu-amor.pdf'
         ],
-        'Acao_de_gracas': [
+        'Acao de gracas': [
             'deus_esta_aqui.pdf',
             'e_impossivel_nao_crer_em_ti.pdf',
             'espirito_santo.pdf',
