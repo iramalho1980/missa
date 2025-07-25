@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Letras de Música - Visualizador</title>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        * {
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>
+   Letras de Música - Visualizador
+  </title>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+  <style>
+   * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -677,70 +679,91 @@
             border-radius: 4px;
             margin-left: auto;
         }
-    </style>
-</head>
-<body>
-    <!-- Floating particles -->
-    <div class="particles" id="particles"></div>
-
-    <!-- Toggle button for Missa de hoje -->
-    <div class="missa-toggle" id="missaToggle" title="Missa de hoje">
-        ⛪
+  </style>
+ </head>
+ <body>
+  <!-- Floating particles -->
+  <div class="particles" id="particles">
+  </div>
+  <!-- Toggle button for Missa de hoje -->
+  <div class="missa-toggle" id="missaToggle" title="Missa de hoje">
+   ⛪
+  </div>
+  <!-- Missa de hoje container -->
+  <div class="missa-hoje-container hidden" id="missaHojeContainer">
+   <div class="missa-hoje-title">
+    <div class="missa-hoje-icon">
+     ⛪
     </div>
-
-    <!-- Missa de hoje container -->
-    <div class="missa-hoje-container hidden" id="missaHojeContainer">
-        <div class="missa-hoje-title">
-            <div class="missa-hoje-icon">⛪</div>
-            Missa de hoje
-        </div>
-        <div class="missa-drop-zone empty" id="missaDropZone">
-            <div>📋</div>
-            <div>Arraste os cânticos aqui</div>
-            <div style="font-size: 0.8rem; margin-top: 5px;">para organizar a missa</div>
-        </div>
-        <div class="missa-actions">
-            <button class="missa-btn clear" onclick="clearMissa()">Limpar</button>
-            <button class="missa-btn save" onclick="saveMissa()">Salvar</button>
-        </div>
+    Missa de hoje
+   </div>
+   <div class="missa-drop-zone empty" id="missaDropZone">
+    <div>
+     📋
     </div>
-
-    <div class="container">
-        <div class="header">
-            <h1>🎵 Letras de Música</h1>
-            <p>Explore nossa coleção de letras organizadas por categoria</p>
-            
-            <div class="search-container">
-                <input type="text" class="search-input" id="searchInput" placeholder="Buscar músicas pelo nome ou conteúdo...">
-                <span class="search-icon">🔍</span>
-                <div class="search-results" id="searchResults"></div>
-            </div>
-        </div>
-
-        <div class="categories-grid" id="categoriesGrid">
-            <div class="loading">
-                <div class="spinner"></div>
-                <p>Carregando letras...</p>
-            </div>
-        </div>
+    <div>
+     Arraste os cânticos aqui
     </div>
-
-    <!-- Modal for PDF/Image viewing -->
-    <div id="fileModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title" id="modalTitle">Carregando...</div>
-                <span class="close" id="closeModal">&times;</span>
-            </div>
-            <iframe class="pdf-viewer" id="pdfViewer" src="" style="display: none;"></iframe>
-            <div class="image-viewer" id="imageViewer" style="display: none;">
-                <img id="imageContent" src="" alt="Letra da música">
-            </div>
-        </div>
+    <div style="font-size: 0.8rem; margin-top: 5px;">
+     para organizar a missa
     </div>
-
-    <script>
-        // Lyrics data - populated from the extracted files
+   </div>
+   <div class="missa-actions">
+    <button class="missa-btn clear" onclick="clearMissa()">
+     Limpar
+    </button>
+    <button class="missa-btn save" onclick="saveMissa()">
+     Salvar
+    </button>
+   </div>
+  </div>
+  <div class="container">
+   <div class="header">
+    <h1>
+     🎵 Letras de Música
+    </h1>
+    <p>
+     Explore nossa coleção de letras organizadas por categoria
+    </p>
+    <div class="search-container">
+     <input class="search-input" id="searchInput" placeholder="Buscar músicas pelo nome ou conteúdo..." type="text"/>
+     <span class="search-icon">
+      🔍
+     </span>
+     <div class="search-results" id="searchResults">
+     </div>
+    </div>
+   </div>
+   <div class="categories-grid" id="categoriesGrid">
+    <div class="loading">
+     <div class="spinner">
+     </div>
+     <p>
+      Carregando letras...
+     </p>
+    </div>
+   </div>
+  </div>
+  <!-- Modal for PDF/Image viewing -->
+  <div class="modal" id="fileModal">
+   <div class="modal-content">
+    <div class="modal-header">
+     <div class="modal-title" id="modalTitle">
+      Carregando...
+     </div>
+     <span class="close" id="closeModal">
+      ×
+     </span>
+    </div>
+    <iframe class="pdf-viewer" id="pdfViewer" src="" style="display: none;">
+    </iframe>
+    <div class="image-viewer" id="imageViewer" style="display: none;">
+     <img alt="Letra da música" id="imageContent" src=""/>
+    </div>
+   </div>
+  </div>
+  <script>
+   // Lyrics data - populated from the extracted files
         const lyricsData = {
             "1 - Entrada": [
                 {
@@ -1668,7 +1691,68 @@
             searchInput.value = '';
             searchResults.classList.remove('active');
         }
-    </script>
-</body>
+  </script>
+  <div id="novos-canticos">
+   <h2>
+    Novos Cânticos Adicionados
+   </h2>
+   <ul id="canticos-list">
+    <li>
+     <a href="Letras/5 - Aclamação Evangelho/Aclamação - A vossa palavra senhor.jpeg">
+      Aclamação - A vossa palavra senhor
+     </a>
+    </li>
+    <li>
+     <a href="Letras/Ação de graças/Ação de graças - Só em ti.jpeg">
+      Ação de graças - Só em ti
+     </a>
+    </li>
+    <li>
+     <a href="Letras/9 - Comunhão/Comunhão - Eis que sou o pão da vida.jpeg">
+      Comunhão - Eis que sou o pão da vida
+     </a>
+    </li>
+    <li>
+     <a href="Letras/9 - Comunhão/Comunhão - Todo aquele que comer.jpeg">
+      Comunhão - Todo aquele que comer
+     </a>
+    </li>
+    <li>
+     <a href="Letras/1 - Entrada/Entrada - Creio.jpeg">
+      Entrada - Creio
+     </a>
+    </li>
+    <li>
+     <a href="Letras/1 - Entrada/Entrada - Tu és a razão da jornada.jpeg">
+      Entrada - Tu és a razão da jornada
+     </a>
+    </li>
+    <li>
+     <a href="Letras/3 - Glória/Gloria - Gloria a Deus nas alturas.jpeg">
+      Gloria - Gloria a Deus nas alturas
+     </a>
+    </li>
+    <li>
+     <a href="Letras/3 - Glória/Gloria - continuação.jpeg">
+      Gloria - continuação
+     </a>
+    </li>
+    <li>
+     <a href="Letras/6 - Ofertório/Ofertorio - Os dons que trago aqui.jpeg">
+      Ofertorio - Os dons que trago aqui
+     </a>
+    </li>
+    <li>
+     <a href="Letras/2 - Ato Penitencial/Piedade - Senhor que viestes salvar.jpeg">
+      Piedade - Senhor que viestes salvar
+     </a>
+    </li>
+    <li>
+     <a href="Letras/7 - Santo/Santo - Santo santo santo éh o senhor.jpeg">
+      Santo - Santo santo santo éh o senhor
+     </a>
+    </li>
+   </ul>
+  </div>
+ </body>
 </html>
-
