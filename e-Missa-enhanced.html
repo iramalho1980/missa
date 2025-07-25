@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Letras de Música - Visualizador e Montador de Missa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Open Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 25%, #2d4a3e 50%, #1a1a1a 75%, #000000 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            background: linear-gradient(45deg, #ffd700, #ffed4e, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 300;
+            margin-bottom: 25px;
+        }
+        
+        .search-container {
+            max-width: 500px;
+            margin: 0 auto;
+            margin-bottom: 40px;
+        }
+        
+        .search-container input {
+            width: 100%;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        .search-container input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .search-container input:focus {
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+        }
+        
+        .category-navigation {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+        }
+        
+        .category-navigation button {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 25px;
+            padding: 10px 20px;
+            margin: 5px;
+            color: #ffffff;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .category-navigation button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .category-navigation button.active {
+            background: #ffd700;
+            color: #333333;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Missa Builder Section */
+        .missa-builder {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+
+        .missa-builder h2 {
+            text-align: center;
+            font-size: 2rem;
+            color: #ffd700;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .missa-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .missa-controls button {
+            background: #ffd700;
+            color: #333333;
+            border: none;
+            border-radius: 25px;
+            padding: 12px 24px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .missa-controls button:hover {
+            background: #ffeb3b;
+            transform: scale(1.05);
+        }
+
+        .missa-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .missa-slot {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            min-height: 120px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .missa-slot.drag-over {
+            border-color: #ffd700;
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .missa-slot h3 {
+            color: #ffd700;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .missa-slot .selected-cantico {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .missa-slot .selected-cantico .remove-btn {
+            background: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .saved-missas {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .saved-missas h3 {
+            color: #ffd700;
+            margin-bottom: 15px;
+        }
+
+        .saved-missa-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .saved-missa-item button {
+            background: #ffd700;
+            color: #333;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+        
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            padding-bottom: 50px;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(15px);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+        }
+        
+        .card.hidden {
+            display: none;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+        
+        .card h2 {
+            font-size: 1.8rem;
+            color: #ffd700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            margin: 0;
+        }
+        
+        .toggle-btn {
+            background: none;
+            border: none;
+            color: #ffd700;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .toggle-btn.collapsed {
+            transform: rotate(-90deg);
+        }
+        
+        .card-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .card-content.expanded {
+            max-height: 1000px;
+        }
+        
+        .card ul {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 20px;
+        }
+        
+        .card ul li {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .card ul li a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: color 0.2s ease;
+            cursor: pointer;
+            flex: 1;
+        }
+        
+        .card ul li a:hover {
+            color: #ffd700;
+        }
+        
+        .card ul li::before {
+            content: '🎵';
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .cantico-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            cursor: grab;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cantico-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(5px);
+        }
+
+        .cantico-item.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+
+        .cantico-item .drag-handle {
+            color: #ffd700;
+            margin-right: 8px;
+            cursor: grab;
+        }
+        
+        .card .view-all {
+            display: inline-block;
+            background: #ffd700;
+            color: #333333;
+            padding: 8px 15px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            align-self: flex-start;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .card .view-all:hover {
+            background: #ffeb3b;
+            transform: scale(1.05);
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+
+        .modal-content {
+            position: relative;
+            margin: 2% auto;
+            width: 90%;
+            height: 90%;
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            background: #333;
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        .close:hover {
+            color: #fff;
+        }
+
+        .modal-body {
+            height: calc(100% - 70px);
+            padding: 0;
+        }
+
+        .modal-body iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .modal-body img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #f0f0f0;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.2rem;
+        }
+
+        /* Input modal styles */
+        .input-modal {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        .input-modal-content {
+            position: relative;
+            margin: 15% auto;
+            width: 400px;
+            background: #333;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .input-modal input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .input-modal button {
+            background: #ffd700;
+            color: #333;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Letras de Música</h1>
+            <p>Seu portal para as mais belas letras de cânticos religiosos e montador de missas.</p>
+            <div class="search-container">
+                <input id="searchInput" placeholder="Buscar cânticos..." type="text">
+            </div>
+            <nav class="category-navigation">
+                <button class="active" data-category="Todos">Todos</button>
+                <button data-category="Entrada">Entrada</button>
+                <button data-category="Ato Penitencial">Ato Penitencial</button>
+                <button data-category="Glória">Glória</button>
+                <button data-category="Aclamação">Aclamação</button>
+                <button data-category="Ofertas">Ofertas</button>
+                <button data-category="Santo">Santo</button>
+                <button data-category="Paz">Paz</button>
+                <button data-category="Cordeiro">Cordeiro</button>
+                <button data-category="Comunhão">Comunhão</button>
+                <button data-category="Pós-Comunhão">Pós-Comunhão</button>
+                <button data-category="Final">Final</button>
+                <button data-category="Nossa Senhora">Nossa Senhora</button>
+                <button data-category="Adoração">Adoração</button>
+                <button data-category="Espírito Santo">Espírito Santo</button>
+                <button data-category="Natal">Natal</button>
+                <button data-category="Quarema">Quarema</button>
+                <button data-category="Páscoa">Páscoa</button>
+                <button data-category="Pentecostes">Pentecostes</button>
+                <button data-category="Outros">Outros</button>
+            </nav>
+        </header>
+
+        <!-- Missa Builder Section -->
+        <section class="missa-builder">
+            <h2>Montador de Missa</h2>
+            <div class="missa-controls">
+                <button onclick="clearMissa()">Limpar Missa</button>
+                <button onclick="saveMissa()">Salvar Missa</button>
+                <button onclick="loadMissa()">Carregar Missa</button>
+                <button onclick="exportMissa()">Exportar Missa</button>
+            </div>
+            
+            <div class="missa-grid" id="missaGrid">
+                <div class="missa-slot" data-category="Entrada">
+                    <h3>Entrada</h3>
+                    <div class="slot-content" id="slot-Entrada"></div>
+                </div>
+                <div class="missa-slot" data-category="Ato Penitencial">
+                    <h3>Ato Penitencial</h3>
+                    <div class="slot-content" id="slot-Ato Penitencial"></div>
+                </div>
+                <div class="missa-slot" data-category="Glória">
+                    <h3>Glória</h3>
+                    <div class="slot-content" id="slot-Glória"></div>
+                </div>
+                <div class="missa-slot" data-category="Aclamação">
+                    <h3>Aclamação</h3>
+                    <div class="slot-content" id="slot-Aclamação"></div>
+                </div>
+                <div class="missa-slot" data-category="Ofertas">
+                    <h3>Ofertas</h3>
+                    <div class="slot-content" id="slot-Ofertas"></div>
+                </div>
+                <div class="missa-slot" data-category="Santo">
+                    <h3>Santo</h3>
+                    <div class="slot-content" id="slot-Santo"></div>
+                </div>
+                <div class="missa-slot" data-category="Paz">
+                    <h3>Paz</h3>
+                    <div class="slot-content" id="slot-Paz"></div>
+                </div>
+                <div class="missa-slot" data-category="Cordeiro">
+                    <h3>Cordeiro</h3>
+                    <div class="slot-content" id="slot-Cordeiro"></div>
+                </div>
+                <div class="missa-slot" data-category="Comunhão">
+                    <h3>Comunhão</h3>
+                    <div class="slot-content" id="slot-Comunhão"></div>
+                </div>
+                <div class="missa-slot" data-category="Pós-Comunhão">
+                    <h3>Pós-Comunhão</h3>
+                    <div class="slot-content" id="slot-Pós-Comunhão"></div>
+                </div>
+                <div class="missa-slot" data-category="Final">
+                    <h3>Final</h3>
+                    <div class="slot-content" id="slot-Final"></div>
+                </div>
+            </div>
+
+            <div class="saved-missas">
+                <h3>Missas Salvas</h3>
+                <div id="savedMissasList"></div>
+            </div>
+        </section>
+        
+        <main class="content-grid" id="contentGrid">
+            <!-- Cards serão gerados dinamicamente pelo JavaScript -->
+        </main>
+
+        <div class="no-results" id="noResults" style="display: none;">
+            <p>Nenhum cântico encontrado para sua busca.</p>
+        </div>
+        
+        <footer class="footer">
+            <p>&copy; 2023 Letras de Música. Todos os direitos reservados.</p>
+        </footer>
+    </div>
+
+    <!-- Modal para exibir PDFs e imagens -->
+    <div id="canticoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Cântico</h3>
+                <button class="close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Conteúdo será inserido dinamicamente -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para input de nome da missa -->
+    <div id="inputModal" class="input-modal">
+        <div class="input-modal-content">
+            <h3 style="color: white; margin-bottom: 15px;">Nome da Missa</h3>
+            <input type="text" id="missaNameInput" placeholder="Digite o nome da missa...">
+            <div>
+                <button onclick="confirmSaveMissa()">Salvar</button>
+                <button onclick="closeInputModal()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let canticosData = {};
+        let currentCategory = 'Todos';
+        let searchTerm = '';
+        let currentMissa = {};
+        let savedMissas = JSON.parse(localStorage.getItem('savedMissas')) || {};
+
+        // Carregar dados dos cânticos
+        async function loadCanticosData() {
+            try {
+                const response = await fetch('canticos_data.json');
+                canticosData = await response.json();
+                renderCards();
+                loadSavedMissas();
+            } catch (error) {
+                console.error('Erro ao carregar dados dos cânticos:', error);
+            }
+        }
+
+        // Renderizar cards
+        function renderCards() {
+            const contentGrid = document.getElementById('contentGrid');
+            const noResults = document.getElementById('noResults');
+            contentGrid.innerHTML = '';
+            
+            let hasVisibleCards = false;
+
+            for (const [category, canticos] of Object.entries(canticosData)) {
+                if (canticos.length === 0) continue;
+                
+                // Filtrar por categoria
+                if (currentCategory !== 'Todos' && category !== currentCategory) {
+                    continue;
+                }
+
+                // Filtrar por busca
+                let filteredCanticos = canticos;
+                if (searchTerm) {
+                    filteredCanticos = canticos.filter(cantico => 
+                        cantico.name.toLowerCase().includes(searchTerm.toLowerCase())
+                    );
+                }
+
+                if (filteredCanticos.length === 0) continue;
+
+                hasVisibleCards = true;
+
+                const card = createCard(category, filteredCanticos);
+                contentGrid.appendChild(card);
+            }
+
+            noResults.style.display = hasVisibleCards ? 'none' : 'block';
+        }
+
+        // Criar card
+        function createCard(category, canticos) {
+            const card = document.createElement('div');
+            card.className = 'card';
+            
+            const displayLimit = 4;
+            const displayCanticos = canticos.slice(0, displayLimit);
+            const hasMore = canticos.length > displayLimit;
+
+            card.innerHTML = `
+                <div class="card-header" onclick="toggleCard(this)">
+                    <h2>Cânticos ${category === 'Entrada' ? 'de' : category === 'Ato Penitencial' ? 'para o' : category === 'Glória' ? 'para o' : category === 'Aclamação' ? 'para' : category === 'Ofertas' ? 'para as' : category === 'Santo' ? 'para o' : category === 'Paz' ? 'para o Abraço da' : category === 'Cordeiro' ? 'para o Cordeiro de Deus' : category === 'Comunhão' ? 'de' : category === 'Pós-Comunhão' ? '' : category === 'Final' ? '' : category === 'Nossa Senhora' ? 'para' : category === 'Adoração' ? 'de' : category === 'Espírito Santo' ? 'ao' : category === 'Natal' ? 'de' : category === 'Quarema' ? 'para a' : category === 'Páscoa' ? 'para a' : category === 'Pentecostes' ? 'para' : ''} ${category}</h2>
+                    <button class="toggle-btn collapsed">▼</button>
+                </div>
+                <div class="card-content">
+                    <div class="canticos-list">
+                        ${displayCanticos.map(cantico => `
+                            <div class="cantico-item" draggable="true" data-category="${category}" data-cantico='${JSON.stringify(cantico)}'>
+                                <span class="drag-handle">⋮⋮</span>
+                                <a onclick="openCantico('${cantico.path}', '${cantico.name}', '${cantico.type}')">${cantico.name}</a>
+                            </div>
+                        `).join('')}
+                    </div>
+                    ${hasMore ? `<button class="view-all" onclick="showAllCanticos('${category}')">Ver Todos (${canticos.length})</button>` : ''}
+                </div>
+            `;
+
+            return card;
+        }
+
+        // Toggle card
+        function toggleCard(header) {
+            const content = header.nextElementSibling;
+            const toggleBtn = header.querySelector('.toggle-btn');
+            
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                toggleBtn.classList.add('collapsed');
+            } else {
+                content.classList.add('expanded');
+                toggleBtn.classList.remove('collapsed');
+            }
+        }
+
+        // Mostrar todos os cânticos de uma categoria
+        function showAllCanticos(category) {
+            const canticos = canticosData[category];
+            const card = event.target.closest('.card');
+            const canticosList = card.querySelector('.canticos-list');
+            const viewAllBtn = card.querySelector('.view-all');
+
+            canticosList.innerHTML = canticos.map(cantico => `
+                <div class="cantico-item" draggable="true" data-category="${category}" data-cantico='${JSON.stringify(cantico)}'>
+                    <span class="drag-handle">⋮⋮</span>
+                    <a onclick="openCantico('${cantico.path}', '${cantico.name}', '${cantico.type}')">${cantico.name}</a>
+                </div>
+            `).join('');
+
+            viewAllBtn.style.display = 'none';
+            setupDragAndDrop();
+        }
+
+        // Abrir cântico no modal
+        function openCantico(path, name, type) {
+            const modal = document.getElementById('canticoModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+
+            modalTitle.textContent = name;
+
+            if (type === 'pdf') {
+                modalBody.innerHTML = `<iframe src="${path}" type="application/pdf"></iframe>`;
+            } else {
+                modalBody.innerHTML = `<img src="${path}" alt="${name}">`;
+            }
+
+            modal.style.display = 'block';
+        }
+
+        // Fechar modal
+        function closeModal() {
+            const modal = document.getElementById('canticoModal');
+            modal.style.display = 'none';
+        }
+
+        // Filtrar por categoria
+        function filterByCategory(category) {
+            currentCategory = category;
+            
+            // Atualizar botões ativos
+            document.querySelectorAll('.category-navigation button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            renderCards();
+            setupDragAndDrop();
+        }
+
+        // Buscar cânticos
+        function searchCanticos() {
+            searchTerm = document.getElementById('searchInput').value;
+            renderCards();
+            setupDragAndDrop();
+        }
+
+        // Setup drag and drop
+        function setupDragAndDrop() {
+            // Setup draggable items
+            document.querySelectorAll('.cantico-item').forEach(item => {
+                item.addEventListener('dragstart', handleDragStart);
+                item.addEventListener('dragend', handleDragEnd);
+            });
+
+            // Setup drop zones
+            document.querySelectorAll('.missa-slot').forEach(slot => {
+                slot.addEventListener('dragover', handleDragOver);
+                slot.addEventListener('drop', handleDrop);
+                slot.addEventListener('dragenter', handleDragEnter);
+                slot.addEventListener('dragleave', handleDragLeave);
+            });
+        }
+
+        function handleDragStart(e) {
+            e.target.classList.add('dragging');
+            e.dataTransfer.setData('text/plain', JSON.stringify({
+                category: e.target.dataset.category,
+                cantico: JSON.parse(e.target.dataset.cantico)
+            }));
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+        }
+
+        function handleDragEnter(e) {
+            e.target.closest('.missa-slot').classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            if (!e.target.closest('.missa-slot').contains(e.relatedTarget)) {
+                e.target.closest('.missa-slot').classList.remove('drag-over');
+            }
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            const slot = e.target.closest('.missa-slot');
+            slot.classList.remove('drag-over');
+            
+            const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+            const slotCategory = slot.dataset.category;
+            
+            addCanticoToSlot(slotCategory, data.cantico);
+        }
+
+        function addCanticoToSlot(category, cantico) {
+            if (!currentMissa[category]) {
+                currentMissa[category] = [];
+            }
+            
+            // Verificar se o cântico já está na categoria
+            const exists = currentMissa[category].some(c => c.name === cantico.name);
+            if (!exists) {
+                currentMissa[category].push(cantico);
+                updateSlotDisplay(category);
+            }
+        }
+
+        function updateSlotDisplay(category) {
+            const slotContent = document.getElementById(`slot-${category}`);
+            const canticos = currentMissa[category] || [];
+            
+            slotContent.innerHTML = canticos.map((cantico, index) => `
+                <div class="selected-cantico">
+                    <span onclick="openCantico('${cantico.path}', '${cantico.name}', '${cantico.type}')" style="cursor: pointer;">${cantico.name}</span>
+                    <button class="remove-btn" onclick="removeCanticoFromSlot('${category}', ${index})">×</button>
+                </div>
+            `).join('');
+        }
+
+        function removeCanticoFromSlot(category, index) {
+            currentMissa[category].splice(index, 1);
+            if (currentMissa[category].length === 0) {
+                delete currentMissa[category];
+            }
+            updateSlotDisplay(category);
+        }
+
+        function clearMissa() {
+            currentMissa = {};
+            document.querySelectorAll('.slot-content').forEach(slot => {
+                slot.innerHTML = '';
+            });
+        }
+
+        function saveMissa() {
+            if (Object.keys(currentMissa).length === 0) {
+                alert('Adicione pelo menos um cântico à missa antes de salvar.');
+                return;
+            }
+            document.getElementById('inputModal').style.display = 'block';
+        }
+
+        function confirmSaveMissa() {
+            const name = document.getElementById('missaNameInput').value.trim();
+            if (!name) {
+                alert('Digite um nome para a missa.');
+                return;
+            }
+            
+            savedMissas[name] = { ...currentMissa };
+            localStorage.setItem('savedMissas', JSON.stringify(savedMissas));
+            loadSavedMissas();
+            closeInputModal();
+            alert('Missa salva com sucesso!');
+        }
+
+        function closeInputModal() {
+            document.getElementById('inputModal').style.display = 'none';
+            document.getElementById('missaNameInput').value = '';
+        }
+
+        function loadSavedMissas() {
+            const savedMissasList = document.getElementById('savedMissasList');
+            savedMissasList.innerHTML = '';
+            
+            for (const [name, missa] of Object.entries(savedMissas)) {
+                const item = document.createElement('div');
+                item.className = 'saved-missa-item';
+                item.innerHTML = `
+                    <span>${name}</span>
+                    <div>
+                        <button onclick="loadMissaByName('${name}')">Carregar</button>
+                        <button onclick="deleteMissa('${name}')" style="background: #ff4444;">Excluir</button>
+                    </div>
+                `;
+                savedMissasList.appendChild(item);
+            }
+        }
+
+        function loadMissaByName(name) {
+            currentMissa = { ...savedMissas[name] };
+            for (const category of Object.keys(currentMissa)) {
+                updateSlotDisplay(category);
+            }
+        }
+
+        function deleteMissa(name) {
+            if (confirm(`Tem certeza que deseja excluir a missa "${name}"?`)) {
+                delete savedMissas[name];
+                localStorage.setItem('savedMissas', JSON.stringify(savedMissas));
+                loadSavedMissas();
+            }
+        }
+
+        function loadMissa() {
+            if (Object.keys(savedMissas).length === 0) {
+                alert('Nenhuma missa salva encontrada.');
+                return;
+            }
+            
+            const names = Object.keys(savedMissas);
+            const selected = prompt(`Missas disponíveis:\n${names.join('\n')}\n\nDigite o nome da missa que deseja carregar:`);
+            
+            if (selected && savedMissas[selected]) {
+                loadMissaByName(selected);
+            } else if (selected) {
+                alert('Missa não encontrada.');
+            }
+        }
+
+        function exportMissa() {
+            if (Object.keys(currentMissa).length === 0) {
+                alert('Nenhuma missa montada para exportar.');
+                return;
+            }
+            
+            let exportText = 'MISSA MONTADA\n\n';
+            for (const [category, canticos] of Object.entries(currentMissa)) {
+                exportText += `${category.toUpperCase()}:\n`;
+                canticos.forEach(cantico => {
+                    exportText += `- ${cantico.name}\n`;
+                });
+                exportText += '\n';
+            }
+            
+            const blob = new Blob([exportText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'missa.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCanticosData();
+
+            // Busca
+            document.getElementById('searchInput').addEventListener('input', searchCanticos);
+
+            // Navegação por categoria
+            document.querySelectorAll('.category-navigation button').forEach(button => {
+                button.addEventListener('click', function() {
+                    filterByCategory(this.dataset.category);
+                });
+            });
+
+            // Fechar modal ao clicar fora
+            window.addEventListener('click', function(event) {
+                const modal = document.getElementById('canticoModal');
+                const inputModal = document.getElementById('inputModal');
+                if (event.target === modal) {
+                    closeModal();
+                }
+                if (event.target === inputModal) {
+                    closeInputModal();
+                }
+            });
+
+            // Setup inicial do drag and drop
+            setTimeout(setupDragAndDrop, 1000);
+        });
+    </script>
+</body>
+</html>
+
