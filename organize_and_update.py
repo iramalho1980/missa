@@ -3,8 +3,8 @@ import os
 import shutil
 from bs4 import BeautifulSoup
 
-# Caminhos
-extracted_dir = '/home/ubuntu/missa_extracted/Missa'
+# Caminhosextracted_dir = 
+'/home/ubuntu/upload/Missa'
 repo_dir = '/home/ubuntu/missa'
 letras_dir = os.path.join(repo_dir, 'Letras')
 diversos_dir = os.path.join(letras_dir, 'Diversos')
@@ -29,18 +29,7 @@ if not os.path.exists(diversos_dir):
     os.makedirs(diversos_dir)
 
 # Organizar arquivos
-for filename in os.listdir(extracted_dir):
-    src_path = os.path.join(extracted_dir, filename)
-    if os.path.isfile(src_path):
-        dest_folder_name = canticos_map.get(filename, 'Diversos')
-        dest_dir = os.path.join(letras_dir, dest_folder_name)
 
-        if not os.path.exists(dest_dir):
-            os.makedirs(dest_dir)
-
-        dest_path = os.path.join(dest_dir, filename)
-        shutil.move(src_path, dest_path)
-        print(f'Movido: {filename} para {dest_dir}')
 
 # Atualizar HTML
 index_html_path = os.path.join(repo_dir, 'e-Missa.html')
