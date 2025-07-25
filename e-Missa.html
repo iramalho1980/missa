@@ -13,7 +13,7 @@
             <h1>E-Missa: Organização de Cânticos</h1>
             <input type="text" id="search-input" placeholder="Pesquisar cântico...">
         </header>
-        
+
         <main>
             <section id="canticos-section">
                 <h2>Relação de Cânticos</h2>
@@ -30,20 +30,30 @@
                 <button id="save-missa">Salvar Ordem da Missa</button>
             </section>
         </main>
-    </div>
 
-    <div id="popup" class="popup-container">
-        <div class="popup-content">
-            <span class="close-button">&times;</span>
-            <iframe id="pdf-viewer" src="" frameborder="0"></iframe>
+        <!-- Popup para visualizar PDFs/imagens -->
+        <div id="popup" class="popup-container">
+            <div class="popup-content">
+                <span class="close-button">&times;</span>
+                <iframe id="pdf-viewer" src="" frameborder="0"></iframe>
+            </div>
         </div>
-    </div>
+
+        <!-- Popup para resultados de pesquisa -->
+        <div id="search-results-popup" class="popup-container">
+            <div id="search-results-content" class="popup-content glassmorphism">
+                <span id="search-results-close" class="close-button">&times;</span>
+                <h3>Resultados da Pesquisa</h3>
+                <div id="search-results-list">
+                    <!-- Resultados da pesquisa aparecerão aqui -->
+                </div>
+            </div>
+        </div>
 
     <script src="script.js"></script>
     <script src="github-integration.js"></script>
 </body>
 </html>
-
 
 <!-- Forcing GitHub Pages rebuild -->
 

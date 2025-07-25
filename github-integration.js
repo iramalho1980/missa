@@ -1,7 +1,7 @@
 // Configuração do GitHub
 const GITHUB_CONFIG = {
     username: 'iramalho1980',
-    repo: 'e_missa',
+    repo: 'missa',
     token: '', // Token será configurado via variável de ambiente ou input do usuário
     apiUrl: 'https://api.github.com'
 };
@@ -17,17 +17,22 @@ class GitHubIntegration {
         };
     }
 
-    // Salvar dados da missa no GitHub
     async saveMissaToGitHub(missaData) {
         try {
-            const filename = `missa_${new Date().toISOString().split('T')[0]}.json`;
+            // Se não há token, salva apenas localmente
+            if (!this.config.token) {
+                console.log("Token do GitHub não configurado. Salvando apenas localmente.");
+                return { message: "Salvo localmente" };
+            }
+
+            const filename = `missas_salvas/missa_${new Date().toISOString().split('T')[0]}_${Date.now()}.json`;
             const content = btoa(JSON.stringify(missaData, null, 2));
-            
+
             // Verificar se o arquivo já existe
             const existingFile = await this.getFile(filename);
-            
+
             const data = {
-                message: `Atualizar missa - ${new Date().toLocaleString('pt-BR')}`,
+                message: `Salvar missa - ${new Date().toLocaleDateString('pt-BR')}`,
                 content: content,
                 branch: 'main'
             };
@@ -51,12 +56,11 @@ class GitHubIntegration {
 
             return await response.json();
         } catch (error) {
-            console.error('Erro ao salvar no GitHub:', error);
+            console.error("Erro ao salvar no GitHub:", error);
             throw error;
         }
     }
 
-    // Obter arquivo do GitHub
     async getFile(filename) {
         try {
             const response = await fetch(
@@ -67,7 +71,7 @@ class GitHubIntegration {
             );
 
             if (response.status === 404) {
-                return null;
+                return null; // Arquivo não encontrado
             }
 
             if (!response.ok) {
@@ -76,16 +80,15 @@ class GitHubIntegration {
 
             return await response.json();
         } catch (error) {
-            console.error('Erro ao obter arquivo:', error);
-            return null;
+            console.error("Erro ao obter arquivo do GitHub:", error);
+            throw error;
         }
     }
 
-    // Listar todas as missas salvas
-    async listSavedMissas() {
+    async getTree(tree_sha) {
         try {
             const response = await fetch(
-                `${this.config.apiUrl}/repos/${this.config.username}/${this.config.repo}/contents/`,
+                `${this.config.apiUrl}/repos/${this.config.username}/${this.config.repo}/git/trees/${tree_sha}?recursive=1`,
                 {
                     headers: this.headers
                 }
@@ -95,195 +98,166 @@ class GitHubIntegration {
                 throw new Error(`Erro HTTP: ${response.status}`);
             }
 
-            const files = await response.json();
-            return files.filter(file => file.name.startsWith('missa_') && file.name.endsWith('.json'));
+            return await response.json();
         } catch (error) {
-            console.error('Erro ao listar missas:', error);
-            return [];
-        }
-    }
-
-    // Carregar missa específica
-    async loadMissa(filename) {
-        try {
-            const file = await this.getFile(filename);
-            if (!file) {
-                throw new Error('Arquivo não encontrado');
-            }
-
-            const content = atob(file.content);
-            return JSON.parse(content);
-        } catch (error) {
-            console.error('Erro ao carregar missa:', error);
+            console.error("Erro ao obter árvore do GitHub:", error);
             throw error;
         }
     }
 
-    // Verificar se o repositório existe e criar se necessário
-    async ensureRepository() {
+    async getLatestCommitSha() {
         try {
             const response = await fetch(
-                `${this.config.apiUrl}/repos/${this.config.username}/${this.config.repo}`,
+                `${this.config.apiUrl}/repos/${this.config.username}/${this.config.repo}/branches/main`,
                 {
                     headers: this.headers
                 }
             );
 
-            if (response.status === 404) {
-                // Criar repositório
-                return await this.createRepository();
+            if (!response.ok) {
+                throw new Error(`Erro HTTP: ${response.status}`);
             }
 
-            return response.ok;
+            const branch = await response.json();
+            return branch.commit.sha;
         } catch (error) {
-            console.error('Erro ao verificar repositório:', error);
-            return false;
+            console.error("Erro ao obter o SHA do último commit:", error);
+            throw error;
         }
     }
 
-    // Criar repositório
-    async createRepository() {
+    async createTree(base_tree_sha, new_tree_items) {
         try {
-            const data = {
-                name: this.config.repo,
-                description: 'Sistema E-Missa para organização de cânticos',
-                private: false,
-                auto_init: true
-            };
-
             const response = await fetch(
-                `${this.config.apiUrl}/user/repos`,
+                `${this.config.apiUrl}/repos/${this.config.username}/${this.config.repo}/git/trees`,
                 {
                     method: 'POST',
                     headers: this.headers,
-                    body: JSON.stringify(data)
+                    body: JSON.stringify({
+                        base_tree: base_tree_sha,
+                        tree: new_tree_items
+                    })
                 }
             );
 
-            return response.ok;
+            if (!response.ok) {
+                throw new Error(`Erro HTTP: ${response.status}`);
+            }
+
+            return await response.json();
         } catch (error) {
-            console.error('Erro ao criar repositório:', error);
-            return false;
+            console.error("Erro ao criar árvore:", error);
+            throw error;
+        }
+    }
+
+    async createCommit(tree_sha, parent_sha, message) {
+        try {
+            const response = await fetch(
+                `${this.config.apiUrl}/repos/${this.config.username}/${this.config.repo}/git/commits`,
+                {
+                    method: 'POST',
+                    headers: this.headers,
+                    body: JSON.stringify({
+                        message: message,
+                        tree: tree_sha,
+                        parents: [parent_sha]
+                    })
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error(`Erro HTTP: ${response.status}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error("Erro ao criar commit:", error);
+            throw error;
+        }
+    }
+
+    async updateBranch(commit_sha) {
+        try {
+            const response = await fetch(
+                `${this.config.apiUrl}/repos/${this.config.username}/${this.config.repo}/git/refs/heads/main`,
+                {
+                    method: 'PATCH',
+                    headers: this.headers,
+                    body: JSON.stringify({
+                        sha: commit_sha
+                    })
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error(`Erro HTTP: ${response.status}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error("Erro ao atualizar branch:", error);
+            throw error;
         }
     }
 }
 
-// Instância global da integração
-const githubIntegration = new GitHubIntegration(GITHUB_CONFIG);
+const github = new GitHubIntegration(GITHUB_CONFIG);
 
-// Função para salvar missa com integração GitHub
-async function saveMissaWithGitHub() {
-    if (missaOrder.length === 0) {
-        alert('Adicione pelo menos um cântico à missa antes de salvar.');
-        return;
-    }
+async function fetchGitHubContent(path) {
+    try {
+        const response = await fetch(
+            `${GITHUB_CONFIG.apiUrl}/repos/${GITHUB_CONFIG.username}/${GITHUB_CONFIG.repo}/contents/${path}`,
+            {
+                headers: {
+                    'Authorization': `token ${GITHUB_CONFIG.token}`,
+                    'Accept': 'application/vnd.github.v3.raw'
+                }
+            }
+        );
 
-    const missaData = {
-        timestamp: new Date().toISOString(),
-        canticos: missaOrder,
-        metadata: {
-            totalCanticos: missaOrder.length,
-            categorias: [...new Set(missaOrder.map(c => c.category))],
-            criadoEm: new Date().toLocaleString('pt-BR')
+        if (response.status === 404) {
+            return null; // Arquivo não encontrado
         }
-    };
 
-    try {
-        // Mostrar loading
-        saveMissaBtn.textContent = 'Salvando...';
-        saveMissaBtn.disabled = true;
+        if (!response.ok) {
+            throw new Error(`Erro HTTP: ${response.status}`);
+        }
 
-        // Salvar localmente primeiro
-        localStorage.setItem('missa_atual', JSON.stringify(missaData));
-
-        // Verificar/criar repositório
-        await githubIntegration.ensureRepository();
-
-        // Salvar no GitHub
-        await githubIntegration.saveMissaToGitHub(missaData);
-
-        alert('Missa salva com sucesso no GitHub!');
+        return await response.text();
     } catch (error) {
-        console.error('Erro ao salvar:', error);
-        alert('Erro ao salvar a missa no GitHub. Dados salvos localmente.');
-    } finally {
-        saveMissaBtn.textContent = 'Salvar Ordem da Missa';
-        saveMissaBtn.disabled = false;
+        console.error("Erro ao buscar conteúdo do GitHub:", error);
+        throw error;
     }
 }
 
-// Função para carregar missas salvas do GitHub
-async function loadMissasFromGitHub() {
+async function updateGitHubContent(path, content, message) {
     try {
-        const missas = await githubIntegration.listSavedMissas();
-        return missas;
+        const existingFile = await github.getFile(path);
+        const parentSha = await github.getLatestCommitSha();
+
+        const newTreeItem = {
+            path: path,
+            mode: '100644',
+            type: 'blob',
+            content: atob(content) // O conteúdo já está em base64, então decodificamos para o blob
+        };
+
+        let treeItems = [newTreeItem];
+
+        if (existingFile) {
+            newTreeItem.sha = existingFile.sha; // Se o arquivo existe, use o SHA existente
+        }
+
+        const newTree = await github.createTree(parentSha, treeItems);
+        const newCommit = await github.createCommit(newTree.sha, parentSha, message);
+        await github.updateBranch(newCommit.sha);
+
+        return newCommit;
     } catch (error) {
-        console.error('Erro ao carregar missas:', error);
-        return [];
+        console.error("Erro ao atualizar conteúdo no GitHub:", error);
+        throw error;
     }
 }
 
-// Adicionar interface para gerenciar missas salvas
-function createMissaManagerInterface() {
-    const managerDiv = document.createElement('div');
-    managerDiv.id = 'missa-manager';
-    managerDiv.innerHTML = `
-        <h3>Missas Salvas</h3>
-        <div id="saved-missas-list"></div>
-        <button id="load-missas-btn">Carregar Missas do GitHub</button>
-    `;
-
-    const missaSection = document.getElementById('missa-section');
-    missaSection.appendChild(managerDiv);
-
-    // Event listener para carregar missas
-    document.getElementById('load-missas-btn').addEventListener('click', async () => {
-        const missas = await loadMissasFromGitHub();
-        displaySavedMissas(missas);
-    });
-}
-
-// Exibir missas salvas
-function displaySavedMissas(missas) {
-    const listDiv = document.getElementById('saved-missas-list');
-    listDiv.innerHTML = '';
-
-    missas.forEach(missa => {
-        const missaItem = document.createElement('div');
-        missaItem.className = 'saved-missa-item';
-        missaItem.innerHTML = `
-            <span>${missa.name}</span>
-            <button onclick="loadSpecificMissa('${missa.name}')">Carregar</button>
-        `;
-        listDiv.appendChild(missaItem);
-    });
-}
-
-// Carregar missa específica
-async function loadSpecificMissa(filename) {
-    try {
-        const missaData = await githubIntegration.loadMissa(filename);
-        
-        // Limpar missa atual
-        missaOrderElement.innerHTML = '';
-        
-        // Carregar cânticos
-        missaData.canticos.forEach(cantico => {
-            addToMissa(cantico);
-        });
-
-        alert('Missa carregada com sucesso!');
-    } catch (error) {
-        console.error('Erro ao carregar missa:', error);
-        alert('Erro ao carregar a missa.');
-    }
-}
-
-// Substituir a função de salvar original
-window.saveMissa = saveMissaWithGitHub;
-
-// Inicializar interface de gerenciamento
-document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(createMissaManagerInterface, 1000);
-});
 

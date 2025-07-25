@@ -3,16 +3,28 @@ let canticosData = {};
 let missaOrder = [];
 
 // Elementos DOM
-const canticosList = document.getElementById('canticos-list');
-const missaOrderElement = document.getElementById('missa-order');
-const searchInput = document.getElementById('search-input');
-const popup = document.getElementById('popup');
-const pdfViewer = document.getElementById('pdf-viewer');
-const closeButton = document.querySelector('.close-button');
-const saveMissaBtn = document.getElementById('save-missa');
+const canticosList = document.getElementById("canticos-list");
+const missaOrderElement = document.getElementById("missa-order");
+const searchInput = document.getElementById("search-input");
+const popup = document.getElementById("popup");
+const pdfViewer = document.getElementById("pdf-viewer");
+const closeButton = document.querySelector(".close-button");
+const saveMissaBtn = document.getElementById("save-missa");
+
+// Novos elementos para o popup de pesquisa
+const searchResultsPopup = document.getElementById("search-results-popup");
+const searchResultsList = document.getElementById("search-results-list");
+const searchResultsCloseBtn = document.getElementById("search-results-close");
+
+// Elementos para carregar missas salvas
+const loadMissaBtn = document.getElementById("load-missa");
+const clearMissaBtn = document.getElementById("clear-missa");
+const loadMissaPopup = document.getElementById("load-missa-popup");
+const loadMissaCloseBtn = document.getElementById("load-missa-close");
+const savedMissasList = document.getElementById("saved-missas-list");
 
 // Inicialização
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener("DOMContentLoaded", function() {
     loadCanticos();
     setupEventListeners();
     loadSavedMissa();
@@ -21,497 +33,484 @@ document.addEventListener('DOMContentLoaded', function() {
 // Carregar cânticos da estrutura de pastas
 function loadCanticos() {
     // Estrutura reorganizada na sequência da missa do tempo comum
-canticosData = {
-        'Entrada': [
-            'a_biblia_e_a_palavra_de_deus.pdf',
-            'bom_pastor.pdf',
-            'coração_santo.pdf',
-            'cristo_ressucitou_aleluia.pdf',
-            'deixa_a_luz_do_ceu_entrar.pdf',
-            'eis_me_aqui_senhor.pdf',
-            'esatremos_aqui_reunidos.pdf',
-            'faco_novas_todas_as_coisas.pdf',
-            'hosana_hey_hosana_ha.pdf',
-            'por_sua_morte.pdf',
-            'porque_ele_vive.pdf',
-            'senhor_quem_entrara.pdf',
-            'te_amarei.pdf',
-            'toda_biblia_e_comunicacao.pdf',
-            'tu_es_a_razao_da_jornada.pdf',
-            'vem_louvar.pdf',
-            'creio.jpeg',
-            'tu_es_a_razao_da_jornada_novo.jpeg'
+    canticosData = {
+        "Entrada": [
+            "a_biblia_e_a_palavra_de_deus.pdf",
+            "bom_pastor.pdf",
+            "coracao_santo.pdf",
+            "cristo_ressucitou_aleluia.pdf",
+            "deixa_a_luz_da_ceu_entrar.pdf",
+            "eis_me_aqui_senhor.pdf",
+            "esatremos_aqui_reunidos.pdf",
+            "faco_novas_todas_as_coisas.pdf",
+            "hosana_hey_hosana_ha.pdf",
+            "por_sua_morte.pdf",
+            "senhor_quem_entrara.pdf",
+            "te_amarei.pdf",
+            "toda_biblia_e_comunicacao.pdf",
+            "tu_es_a_razao_da_jornada.pdf",
+            "tu_es_a_razao_da_jornada_novo.jpeg",
+            "vem_louvar.pdf",
+            "creio.jpeg"
         ],
-        'Ato Penitencial': [
-            'conheco_um_coracao.pdf',
-            'coracoes_arrependidos.pdf',
-            'kyrie_eleison_jmj.pdf',
-            'pelos_pecados_senhor_piedade_de_nos.pdf',
-            'perdao_senhor.pdf',
-            'renovame.pdf',
-            'renovame_ii.pdf',
-            'senhor_que_viestes_salvar_kirie_elleisson.pdf',
-            'senhor_tende_piedade_de_nos.pdf',
-            'senhor_tende_piedade_perdoai_nossa_culpa.pdf',
-            'senhor_que_viestes_salvar_novo.jpeg'
+        "Ato Penitencial": [
+            "conheco_um_coracao.pdf",
+            "coracoes_arrependidos.pdf",
+            "kyrie_eleison_jmj.pdf",
+            "pelos_pecados_senhor_piedade_de_nos.pdf",
+            "perdao_senhor.pdf",
+            "renovame.pdf",
+            "senhor_que_viestes_salvar_kirie_elleisson.pdf",
+            "senhor_que_viestes_salvar_novo.pdf",
+            "senhor_tende_piedade_de_nos.pdf",
+            "senhor_tende_piedade_perdoai_nossa_culpa.pdf"
         ],
-        'Gloria': [
-            'a_ele_seja_a_gloria.pdf',
-            'gloria_a_deus_nas_alturas.pdf',
-            'gloria_a_deus_nas_alturas__rock_balada.pdf',
-            'gloria_ao_pai_criador.pdf',
-            'gloria_a_deus_nas_alturas_novo.jpeg',
-            'gloria_continuacao.jpeg'
+        "Gloria": [
+            "a_ele_seja_a_gloria.pdf",
+            "gloria_a_deus_nas_alturas_novo.pdf",
+            "gloria_a_deus_nas_alturas_rock_balada.pdf",
+            "gloria_a_deus_nas_alturas.pdf",
+            "gloria_ao_pai_criador.pdf",
+            "gloria_gloria_aleluia.pdf",
+            "gloria_in_excelsis_deo.pdf",
+            "gloria_pra_sempre.pdf"
         ],
-        'Aclamacao Evangelho': [
-            'a_minhalma_abrirei.pdf',
-            'a_vossa_palavra_senhor.pdf',
-            'aleluia_como_o_pai_me_amou.pdf',
-            'buscai_primeiro_o_reino_de_deus.pdf',
-            'como_sao_belos.pdf',
-            'eu_vim_para_escutar.pdf',
-            'palavra_de_salvacao.pdf',
-            'que_alegria_cristo_ressurgiu.pdf',
-            'vai_falar_no_evangelho.pdf',
-            'vinde_espirito_de_deus.pdf',
-            'a_vossa_palavra_senhor_novo.jpeg'
+        "Aclamação ao Evangelho": [
+            "aleluia_a_minha_alma_abrir.pdf",
+            "aleluia_novo.pdf",
+            "aleluia_quando_estamos_unidos.pdf"
         ],
-        'Ofertorio': [
-            'de_maos_estendidas.pdf',
-            'meu_coracao_eh_para_ti.pdf',
-            'minha_vida_tem_sentido.pdf',
-            'muitos_graos_de_trigo.pdf',
-            'ofertas_singelas.pdf',
-            'sabes_senhor.pdf',
-            'um_coracao_para_amar.pdf',
-            'os_dons_que_trago_aqui.jpeg'
+        "Ofertorio": [
+            "a_nos_chegou_a_alegria.pdf",
+            "bendito_sejas_senhor_novo.pdf",
+            "bendito_sejas_senhor_pelo_vinho.pdf",
+            "bendito_sejas_senhor.pdf"
         ],
-        'Santo': [
-            'hosana_eh.pdf',
-            'hosana_no_alto_ceu.pdf',
-            'o_senhor_eh_santo.pdf',
-            'santo_santo_e.pdf',
-            'santo_santo_santo_eh_o_senhor_novo.jpeg'
+        "Santo": [
+            "santo_e_o_senhor.pdf",
+            "santo_novo.pdf",
+            "santo_santo_santo.pdf"
         ],
-        'Abraco de Paz': [
-            'esteja_sempre_com_voce.pdf',
-            'irmao_minha_paz_eu_te_dou.pdf',
-            'paz_paz_de_cristo.pdf'
+        "Cordeiro": [
+            "cordeiro_de_deus_novo.pdf",
+            "cordeiro_de_deus.pdf"
         ],
-        'Cordeiro': [
-            'cordeiro_do_maior.pdf'
+        "Comunhão": [
+            "a_mesa_esta_pronta.pdf",
+            "a_partilha.pdf",
+            "a_ti_meu_deus.pdf",
+            "ao_cordeiro_de_deus.pdf",
+            "bendito_seja_deus.pdf",
+            "bom_pastor_novo.pdf"
         ],
-        'Comunhão': [
-            'a_barca.pdf',
-            'a_ti_meu_deus.pdf',
-            'antes_da_morte_e_ressurreicao.pdf',
-            'cantar_a_beleza_da_vida.pdf',
-            'como_es_lindo.pdf',
-            'conheço_um_coração.pdf',
-            'da_cepa_brotou_a_rama.pdf',
-            'desamarrem_as_sandalias.pdf',
-            'estas_entre_nos.pdf',
-            'este_pranto_em_minhas_maos.pdf',
-            'eu_navegarei.pdf',
-            'eu_quis_comer_esta_ceia_agora.pdf',
-            'eu_vim_para_que_todos_tenham_vida.pdf',
-            'pelos_prados.pdf',
-            'procuro_abrigo_nos_coracoes.pdf',
-            'quando_teu_pai_revelou.pdf',
-            'quem_nos_separara.pdf',
-            'sacramento_da_comunhao.pdf',
-            'sim_eu_quero.pdf',
-            'sonda_me.pdf',
-            'vem_eu_mostrarei.pdf',
-            'vou_cantar_teu_amor.pdf',
-            'eis_que_sou_o_pao_da_vida.jpeg',
-            'todo_aquele_que_comer.jpeg'
+        "Pós-Comunhão": [
+            "a_escolha.pdf",
+            "a_espera.pdf",
+            "a_fe_e_o_amor.pdf",
+            "a_forca_da_oracao.pdf",
+            "a_luz_divina.pdf",
+            "a_paz_esteja_contigo.pdf",
+            "a_vida_e_um_dom.pdf",
+            "a_vitoria_e_nossa.pdf",
+            "abracar_e_amar.pdf",
+            "adoracao.pdf",
+            "alegria_do_senhor.pdf",
+            "alma_missionaria.pdf",
+            "amigo_fiel.pdf",
+            "amor_que_transforma.pdf",
+            "anjo_da_guarda.pdf",
+            "ao_pe_da_cruz.pdf",
+            "apenas_um_toque.pdf",
+            "aqui_estou.pdf",
+            "as_portas_do_ceu.pdf",
+            "basta_querer.pdf",
+            "caminho_da_luz.pdf",
+            "caminhos_de_deus.pdf",
+            "canta_alegremente.pdf",
+            "cantar_e_orar.pdf",
+            "ceu_azul.pdf",
+            "chamado_de_deus.pdf",
+            "cheio_de_graca.pdf",
+            "com_amor_eterno.pdf",
+            "como_e_bom_louvar.pdf",
+            "confia_em_deus.pdf",
+            "coracao_adorador.pdf",
+            "corpo_e_sangue.pdf",
+            "cristo_vive.pdf",
+            "cura_me_senhor.pdf",
+            "de_maos_dadas.pdf",
+            "deixa_deus_te_amar.pdf",
+            "deus_e_fiel.pdf",
+            "deus_e_pai.pdf",
+            "deus_esta_aqui.pdf",
+            "deus_no_comando.pdf",
+            "doce_espirito.pdf",
+            "e_preciso_amar.pdf",
+            "em_teus_bracos.pdf",
+            "ensina_me_a_amar.pdf",
+            "es_a_minha_rocha.pdf",
+            "espirito_santo.pdf",
+            "eu_creio.pdf",
+            "eu_te_amo_deus.pdf",
+            "face_a_face.pdf",
+            "faz_um_milagre_em_mim.pdf",
+            "fiel_a_ti.pdf",
+            "fonte_de_vida.pdf",
+            "grande_e_o_senhor.pdf",
+            "gratidao.pdf",
+            "incendeia_minha_alma.pdf",
+            "jesus_cristo_e_o_senhor.pdf",
+            "jesus_fonte_de_vida.pdf",
+            "luz_do_mundo.pdf",
+            "mais_perto_quero_estar.pdf",
+            "meu_bom_pastor.pdf",
+            "meu_respirar.pdf",
+            "minha_essencia.pdf",
+            "minha_liberdade.pdf",
+            "no_poder_da_oracao.pdf",
+            "o_amor_de_deus.pdf",
+            "o_ceu_se_abre_novo.pdf",
+            "o_ceu_se_abre.pdf",
+            "o_senhor_e_meu_pastor.pdf",
+            "olhar_de_cristo.pdf",
+            "para_sempre_te_adorarei.pdf",
+            "passos_de_fe.pdf",
+            "paz_na_alma.pdf",
+            "pe_na_estrada.pdf",
+            "perdao_senhor_novo.pdf",
+            "poder_do_ceu.pdf",
+            "pra_te_adorar.pdf",
+            "presenca_divina.pdf",
+            "quando_deus_age.pdf",
+            "que_seja_eterno.pdf",
+            "quem_e_deus.pdf",
+            "quero_louvar_te.pdf",
+            "refugio_e_fortaleza.pdf",
+            "rei_da_gloria.pdf",
+            "rendicao.pdf",
+            "restauracao.pdf",
+            "rocha_eterna.pdf",
+            "sabedoria_divina.pdf",
+            "santo_espirito.pdf",
+            "se_calarem_a_voz.pdf",
+            "sempre_comigo.pdf",
+            "senhor_da_vida.pdf",
+            "senhor_dos_senhores.pdf",
+            "so_em_ti.pdf",
+            "sou_teu_deus.pdf",
+            "teu_amor_me_basta.pdf",
+            "teu_e_o_reino.pdf",
+            "toda_honra_e_gloria.pdf",
+            "tudo_posso.pdf",
+            "um_novo_tempo.pdf",
+            "vamos_celebrar.pdf",
+            "vem_espirito_santo.pdf",
+            "vida_nova.pdf",
+            "vitoria_certa.pdf",
+            "voz_do_ceu.pdf"
         ],
-        'Final': [
-            'a_alegria_esta_no_coracao.pdf',
-            'como_o_pai_me_enviou.pdf',
-            'cristo_eh_a_felicidade.pdf',
-            'deixa_luz_do_ceu_entrar.pdf',
-            'hoje_e_tempo_de_louvar.pdf',
-            'pelas_estradas_da_vida.pdf',
-            'segura_na_mao_de_deus.pdf',
-            'tomado_pela_mao.pdf',
-            'tu_es_razao_jornada.pdf'
-        ],
-        'Cantos Marianos': [
-            'a_escolhida.pdf',
-            'ave_cheia_de_graca.pdf',
-            'imaculada_maria_de_deus.pdf',
-            'maria_de_nazare.pdf',
-            'santa_mae_maria.pdf',
-            'santa_maria_vem.pdf'
-        ],
-        'Louvor e Meditação': [
-            'Desamarrem_as_sandálias.pdf',
-            'a_alegria_esta_no_coracao.pdf',
-            'a_nos_descei_divina_luz.pdf',
-            'agua_viva.pdf',
-            'amar_como_jesus_amou.pdf',
-            'bate_o_sino.pdf',
-            'eu_louvarei.pdf',
-            'eu_quero_um_rio.pdf',
-            'louvado_seja_o_meu_senhor.pdf',
-            'meu_mestre__a_minha_vida_e_do_mestre.pdf',
-            'noite_feliz.pdf',
-            'noites_traicoeiras.pdf',
-            'oracao_da_familia.pdf',
-            'oracao_de_sao_francisco.pdf',
-            'podes_reinar.pdf',
-            'quao_grande_es_tu.pdf',
-            'segura_na_mao_de_deus.pdf',
-            'tao_sublime.pdf',
-            'vou-cantar-teu-amor.pdf'
-        ],
-        'Acao de gracas': [
-            'deus_esta_aqui.pdf',
-            'e_impossivel_nao_crer_em_ti.pdf',
-            'espirito_santo.pdf',
-            'obrigado_senhor.pdf',
-            'so_em_ti.jpeg'
-        ],
-        'Diversos': [
-            'podes_reinar.pdf',
-            'prova_de_amor.pdf'
+        "Final": [
+            "a_bencao_novo.pdf",
+            "a_bencao.pdf",
+            "a_missao.pdf",
+            "agradecemos_senhor.pdf",
+            "amem_amem_amem.pdf",
+            "envia_nos_senhor.pdf",
+            "ide_e_pregai.pdf",
+            "louvado_seja_o_senhor.pdf",
+            "missao_e_vida.pdf",
+            "pelos_caminhos.pdf",
+            "te_louvamos_senhor.pdf",
+            "vamos_com_alegria.pdf",
+            "viver_o_amor.pdf"
         ]
     };
 
-    renderCanticos();
+    displayCanticos(canticosData);
 }
 
-// Renderizar cânticos na interface
-function renderCanticos() {
-    canticosList.innerHTML = '';
-    
-    Object.keys(canticosData).forEach(category => {
-        const categoryCard = createCategoryCard(category, canticosData[category]);
-        canticosList.appendChild(categoryCard);
-    });
+// Exibir cânticos na tela
+function displayCanticos(data) {
+    canticosList.innerHTML = "";
+    for (const section in data) {
+        const sectionDiv = document.createElement("div");
+        sectionDiv.classList.add("cantico-section");
+        sectionDiv.innerHTML = `<h3>${section}</h3>`;
+
+        data[section].forEach(cantico => {
+            const canticoName = cantico.replace(/_|-/g, " ").replace(/\.pdf|\.jpeg|\.jpg/g, "");
+            const canticoDiv = document.createElement("div");
+            canticoDiv.classList.add("cantico-item");
+            canticoDiv.setAttribute("draggable", "true");
+            canticoDiv.dataset.src = cantico;
+            canticoDiv.dataset.section = section;
+            canticoDiv.innerHTML = `<h4>${canticoName}</h4><p>${section}</p>`;
+            canticoDiv.addEventListener("click", () => openPdf(cantico));
+            sectionDiv.appendChild(canticoDiv);
+        });
+        canticosList.appendChild(sectionDiv);
+    }
 }
 
-// Criar card de categoria
-function createCategoryCard(categoryName, canticos) {
-    const card = document.createElement('div');
-    card.className = 'category-card collapsed';
-    
-    const header = document.createElement('div');
-    header.className = 'category-header';
-    header.onclick = () => toggleCategory(card);
-    
-    const title = document.createElement('div');
-    title.className = 'category-title';
-    title.textContent = categoryName;
-    
-    const toggleIcon = document.createElement('div');
-    toggleIcon.className = 'toggle-icon';
-    toggleIcon.textContent = '▼';
-    
-    header.appendChild(title);
-    header.appendChild(toggleIcon);
-    
-    const canticosList = document.createElement('div');
-    canticosList.className = 'canticos-list';
-    
-    canticos.forEach(cantico => {
-        const canticoItem = createCanticoItem(cantico, categoryName);
-        canticosList.appendChild(canticoItem);
-    });
-    
-    card.appendChild(header);
-    card.appendChild(canticosList);
-    
-    return card;
-}
-
-// Criar item de cântico
-function createCanticoItem(canticoFile, category) {
-    const item = document.createElement('div');
-    item.className = 'cantico-item';
-    item.draggable = true;
-    
-    const canticoName = formatCanticoName(canticoFile);
-    item.textContent = canticoName;
-    item.dataset.file = canticoFile;
-    item.dataset.category = category;
-    
-    const addButton = document.createElement('button');
-    addButton.className = 'add-to-missa-btn';
-    addButton.innerHTML = '+';
-    addButton.onclick = (e) => {
-        e.stopPropagation(); // Evita que o clique no botão abra o PDF
-        addToMissa({ file: canticoFile, category: category, name: canticoName });
-    };
-    
-    item.appendChild(addButton);
-    
-    // Event listeners para drag and drop
-    item.addEventListener('dragstart', handleDragStart);
-    item.addEventListener('dragend', handleDragEnd);
-    item.addEventListener('click', () => openPDF(canticoFile, category));
-    
-    return item;
-}
-
-// Formatar nome do cântico
-function formatCanticoName(filename) {
-    return filename
-        .replace('.pdf', '')
-        .replace(/_/g, ' ')
-        .replace(/\b\w/g, l => l.toUpperCase());
-}
-
-// Toggle categoria
-function toggleCategory(card) {
-    card.classList.toggle('collapsed');
+// Abrir PDF ou imagem
+function openPdf(src) {
+    const filePath = `letras/${src}`;
+    pdfViewer.src = filePath;
+    popup.style.display = "flex";
 }
 
 // Configurar event listeners
 function setupEventListeners() {
-    // Busca
-    searchInput.addEventListener('input', handleSearch);
-    
-    // Adicionar listener para Enter na busca
-    searchInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
-            handleSearchEnter();
+    // Fechar popup
+    closeButton.addEventListener("click", () => {
+        popup.style.display = "none";
+        pdfViewer.src = ""; // Limpa o src para parar qualquer mídia
+    });
+
+    // Fechar popup clicando fora
+    window.addEventListener("click", (event) => {
+        if (event.target == popup) {
+            popup.style.display = "none";
+            pdfViewer.src = "";
         }
     });
-    
-    // Drop zone da missa
-    missaOrderElement.addEventListener('dragover', handleDragOver);
-    missaOrderElement.addEventListener('drop', handleDrop);
-    missaOrderElement.addEventListener('dragenter', handleDragEnter);
-    missaOrderElement.addEventListener('dragleave', handleDragLeave);
-    
-    // Popup
-    closeButton.addEventListener('click', closePopup);
-    popup.addEventListener('click', (e) => {
-        if (e.target === popup) closePopup();
-    });
-    
-    // Salvar missa
-    saveMissaBtn.addEventListener('click', saveMissa);
-    
-    // Tecla ESC para fechar popup
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closePopup();
-    });
-}
 
-// Função para lidar com Enter na busca
-function handleSearchEnter() {
-    const searchTerm = searchInput.value.toLowerCase();
-    if (searchTerm.length < 2) return;
-    
-    const visibleCanticos = Array.from(document.querySelectorAll('.cantico-item'))
-        .filter(item => item.style.display !== 'none');
-    
-    if (visibleCanticos.length === 1) {
-        const cantico = visibleCanticos[0];
-        openPDF(cantico.dataset.file, cantico.dataset.category);
-    } else if (visibleCanticos.length > 1) {
-        // Se há múltiplos resultados, abrir o primeiro
-        const cantico = visibleCanticos[0];
-        openPDF(cantico.dataset.file, cantico.dataset.category);
-    }
-}
-
-// Busca de cânticos
-function handleSearch() {
-    const searchTerm = searchInput.value.toLowerCase();
-    const allCanticos = document.querySelectorAll('.cantico-item');
-    
-    allCanticos.forEach(item => {
-        const text = item.textContent.toLowerCase();
-        const match = text.includes(searchTerm);
-        item.style.display = match ? 'block' : 'none';
+    // Pesquisa de cânticos - nova lógica com popup
+    searchInput.addEventListener("input", (event) => {
+        const searchTerm = event.target.value.toLowerCase().trim();
         
-        // Expandir categoria se houver match
-        if (match && searchTerm) {
-            const categoryCard = item.closest('.category-card');
-            categoryCard.classList.remove('collapsed');
+        if (searchTerm.length > 0) {
+            showSearchResults(searchTerm);
+        } else {
+            searchResultsPopup.style.display = "none";
         }
     });
-    
-    // Se não há busca, recolher todas as categorias
-    if (!searchTerm) {
-        document.querySelectorAll('.category-card').forEach(card => {
-            card.classList.add('collapsed');
-        });
-    }
-}
 
-// Drag and Drop handlers
-function handleDragStart(e) {
-    e.dataTransfer.setData('text/plain', JSON.stringify({
-        file: this.dataset.file,
-        category: this.dataset.category,
-        name: this.textContent
-    }));
-    this.classList.add('dragging');
-}
+    // Fechar popup de pesquisa ao pressionar Enter
+    searchInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            const searchTerm = event.target.value.toLowerCase().trim();
+            if (searchTerm.length > 0) {
+                showSearchResults(searchTerm);
+            }
+        }
+    });
 
-function handleDragEnd(e) {
-    this.classList.remove('dragging');
-}
+    // Drag and Drop
+    let draggedItem = null;
 
-function handleDragOver(e) {
-    e.preventDefault();
-}
+    canticosList.addEventListener("dragstart", (e) => {
+        draggedItem = e.target;
+        setTimeout(() => {
+            e.target.classList.add("hide");
+        }, 0);
+    });
 
-function handleDragEnter(e) {
-    e.preventDefault();
-    missaOrderElement.classList.add('drag-over');
-}
+    canticosList.addEventListener("dragend", (e) => {
+        e.target.classList.remove("hide");
+        draggedItem = null;
+    });
 
-function handleDragLeave(e) {
-    if (!missaOrderElement.contains(e.relatedTarget)) {
-        missaOrderElement.classList.remove('drag-over');
-    }
-}
+    missaOrderElement.addEventListener("dragover", (e) => {
+        e.preventDefault();
+    });
 
-function handleDrop(e) {
-    e.preventDefault();
-    missaOrderElement.classList.remove('drag-over');
-    
-    const data = JSON.parse(e.dataTransfer.getData('text/plain'));
-    addToMissa(data);
+    missaOrderElement.addEventListener("dragenter", (e) => {
+        e.preventDefault();
+        missaOrderElement.classList.add("drag-over");
+    });
+
+    missaOrderElement.addEventListener("dragleave", () => {
+        missaOrderElement.classList.remove("drag-over");
+    });
+
+    missaOrderElement.addEventListener("drop", (e) => {
+        e.preventDefault();
+        missaOrderElement.classList.remove("drag-over");
+        if (draggedItem) {
+            addCanticoToMissa(draggedItem.dataset.src, draggedItem.dataset.section);
+        }
+    });
+
+    // Salvar Missa
+    saveMissaBtn.addEventListener("click", saveMissa);
+
+    // Carregar Missa
+    loadMissaBtn.addEventListener("click", () => {
+        loadMissaPopup.style.display = "flex";
+        displaySavedMissas();
+    });
+
+    loadMissaCloseBtn.addEventListener("click", () => {
+        loadMissaPopup.style.display = "none";
+    });
+
+    // Limpar Missa
+    clearMissaBtn.addEventListener("click", clearMissa);
+
+    // Fechar popup de pesquisa
+    searchResultsCloseBtn.addEventListener("click", () => {
+        searchResultsPopup.style.display = "none";
+    });
+
+    // Fechar popup de pesquisa clicando fora
+    window.addEventListener("click", (event) => {
+        if (event.target == searchResultsPopup) {
+            searchResultsPopup.style.display = "none";
+        }
+    });
+
+    // Fechar popup de pesquisa com tecla Escape
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+            if (searchResultsPopup.style.display === "flex") {
+                searchResultsPopup.style.display = "none";
+            }
+            if (popup.style.display === "flex") {
+                popup.style.display = "none";
+                pdfViewer.src = "";
+            }
+        }
+    });
 }
 
 // Adicionar cântico à missa
-function addToMissa(canticoData) {
-    const missaItem = document.createElement('div');
-    missaItem.className = 'missa-item';
-    
-    const canticoInfo = document.createElement('div');
-    canticoInfo.innerHTML = `
-        <strong>${canticoData.name}</strong><br>
-        <small>${canticoData.category}</small>
-    `;
-    
-    const removeBtn = document.createElement('button');
-    removeBtn.className = 'remove-btn';
-    removeBtn.innerHTML = '×';
-    removeBtn.onclick = () => {
+function addCanticoToMissa(src, section) {
+    const canticoName = src.replace(/_|-/g, " ").replace(/\.pdf|\.jpeg|\.jpg/g, "");
+    const missaItem = document.createElement("div");
+    missaItem.classList.add("missa-item");
+    missaItem.dataset.src = src;
+    missaItem.dataset.section = section;
+    missaItem.innerHTML = `<h3>${canticoName}</h3><p>${section}</p><button class="remove-btn">&times;</button>`;
+    missaItem.querySelector(".remove-btn").addEventListener("click", () => {
         missaItem.remove();
         updateMissaOrder();
-    };
-    
-    missaItem.appendChild(canticoInfo);
-    missaItem.appendChild(removeBtn);
-    missaItem.dataset.file = canticoData.file;
-    missaItem.dataset.category = canticoData.category;
-    
-    // Adicionar evento de clique para abrir PDF
-    canticoInfo.addEventListener('click', () => {
-        openPDF(canticoData.file, canticoData.category);
     });
-    
     missaOrderElement.appendChild(missaItem);
     updateMissaOrder();
 }
 
 // Atualizar ordem da missa
 function updateMissaOrder() {
-    missaOrder = Array.from(missaOrderElement.children).map(item => ({
-        file: item.dataset.file,
-        category: item.dataset.category,
-        name: item.querySelector('strong').textContent
-    }));
-}
-
-// Abrir PDF ou imagem no popup
-function openPDF(filename, category) {
-    const filePath = `letras/${category}/${filename}`;
-    const fileExtension = filename.split('.').pop().toLowerCase();
-    
-    if (fileExtension === 'pdf') {
-        pdfViewer.src = filePath;
-        pdfViewer.style.overflow = 'auto';
-    } else if (fileExtension === 'jpeg' || fileExtension === 'jpg') {
-        // Para imagens, criar um elemento img dentro do iframe com scroll
-        pdfViewer.src = `data:text/html,<html><body style="margin:0;padding:20px;background:#f0f0f0;overflow:auto;"><div style="display:flex;justify-content:center;align-items:flex-start;min-height:100vh;"><img src="${filePath}" style="max-width:100%;height:auto;object-fit:contain;" alt="Cântico"></div></body></html>`;
-        pdfViewer.style.overflow = 'auto';
-    }
-    
-    popup.classList.add('show');
-    
-    // Adicionar efeito de fade in
-    setTimeout(() => {
-        popup.style.opacity = '1';
-    }, 10);
-}
-
-// Fechar popup
-function closePopup() {
-    popup.style.opacity = '0';
-    setTimeout(() => {
-        popup.classList.remove('show');
-        pdfViewer.src = '';
-    }, 300);
-}
-
-// Salvar missa no GitHub (simulação)
-async function saveMissa() {
-    if (missaOrder.length === 0) {
-        alert('Adicione pelo menos um cântico à missa antes de salvar.');
-        return;
-    }
-    
-    const missaData = {
-        timestamp: new Date().toISOString(),
-        canticos: missaOrder
-    };
-    
-    try {
-        // Salvar localmente primeiro
-        localStorage.setItem('missa_atual', JSON.stringify(missaData));
-        
-        // Simular salvamento no GitHub
-        await simulateGitHubSave(missaData);
-        
-        alert('Missa salva com sucesso!');
-    } catch (error) {
-        console.error('Erro ao salvar:', error);
-        alert('Erro ao salvar a missa. Tente novamente.');
-    }
-}
-
-// Simular salvamento no GitHub
-async function simulateGitHubSave(data) {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            console.log('Dados salvos no GitHub:', data);
-            resolve();
-        }, 1000);
+    missaOrder = [];
+    missaOrderElement.querySelectorAll(".missa-item").forEach(item => {
+        missaOrder.push({ src: item.dataset.src, section: item.dataset.section });
     });
 }
 
+// Salvar missa no localStorage e GitHub
+function saveMissa() {
+    const missaName = `Missa ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`;
+    const missaData = { name: missaName, order: missaOrder };
+    let savedMissas = JSON.parse(localStorage.getItem("savedMissas")) || [];
+    savedMissas.push(missaData);
+    localStorage.setItem("savedMissas", JSON.stringify(savedMissas));
+    alert("Missa salva com sucesso!");
+    saveMissaToGitHub(missaData);
+}
+
 // Carregar missa salva
-function loadSavedMissa() {
-    const savedMissa = localStorage.getItem('missa_atual');
-    if (savedMissa) {
-        const missaData = JSON.parse(savedMissa);
-        missaData.canticos.forEach(cantico => {
-            addToMissa(cantico);
+function loadMissa(missaData) {
+    missaOrderElement.innerHTML = "";
+    missaOrder = [];
+    missaData.order.forEach(item => {
+        addCanticoToMissa(item.src, item.section);
+    });
+    loadMissaPopup.style.display = "none";
+}
+
+// Exibir missas salvas no popup
+function displaySavedMissas() {
+    savedMissasList.innerHTML = "";
+    let savedMissas = JSON.parse(localStorage.getItem("savedMissas")) || [];
+    if (savedMissas.length === 0) {
+        savedMissasList.innerHTML = "<p>Nenhuma missa salva ainda.</p>";
+        return;
+    }
+    savedMissas.forEach((missa, index) => {
+        const missaDiv = document.createElement("div");
+        missaDiv.innerHTML = `<h4>${missa.name}</h4><p>Cânticos: ${missa.order.length}</p>`;
+        missaDiv.addEventListener("click", () => loadMissa(missa));
+        savedMissasList.appendChild(missaDiv);
+    });
+}
+
+// Limpar missa
+function clearMissa() {
+    missaOrderElement.innerHTML = "";
+    missaOrder = [];
+    alert("Missa limpa!");
+}
+
+// Mostrar resultados de pesquisa no popup
+function showSearchResults(searchTerm) {
+    searchResultsList.innerHTML = "";
+    let hasResults = false;
+    
+    for (const section in canticosData) {
+        canticosData[section].forEach(cantico => {
+            const canticoName = cantico.replace(/_|-/g, " ").replace(/\.pdf|\.jpeg|\.jpg/g, "");
+            if (canticoName.toLowerCase().includes(searchTerm)) {
+                hasResults = true;
+                const canticoDiv = document.createElement("div");
+                canticoDiv.classList.add("cantico-item");
+                canticoDiv.dataset.src = cantico;
+                canticoDiv.dataset.section = section;
+                canticoDiv.innerHTML = `<h4>${canticoName}</h4><p>${section}</p>`;
+                
+                // Adicionar evento de clique para adicionar à missa
+                canticoDiv.addEventListener("click", () => {
+                    addCanticoToMissa(cantico, section);
+                    searchResultsPopup.style.display = "none";
+                    searchInput.value = ""; // Limpar campo de pesquisa
+                });
+                
+                // Adicionar evento de duplo clique para visualizar
+                canticoDiv.addEventListener("dblclick", () => {
+                    openPdf(cantico);
+                    searchResultsPopup.style.display = "none";
+                });
+                
+                searchResultsList.appendChild(canticoDiv);
+            }
         });
+    }
+    
+    if (hasResults) {
+        searchResultsPopup.style.display = "flex";
+    } else {
+        searchResultsList.innerHTML = `
+            <div style="text-align: center; color: #ccc; padding: 20px;">
+                <p>Nenhum cântico encontrado para "${searchTerm}"</p>
+                <p style="font-size: 0.9em;">Tente usar palavras-chave diferentes</p>
+            </div>
+        `;
+        searchResultsPopup.style.display = "flex";
     }
 }
 
-// Função para recarregar cânticos dinamicamente (para futuras atualizações)
-function reloadCanticos() {
-    // Esta função pode ser expandida para verificar mudanças na pasta
-    loadCanticos();
+// Carregar missas salvas do GitHub
+function loadSavedMissa() {
+    fetchGitHubContent("saved_missas.json")
+        .then(content => {
+            if (content) {
+                let savedMissas = JSON.parse(atob(content.content));
+                localStorage.setItem("savedMissas", JSON.stringify(savedMissas));
+                console.log("Missas salvas do GitHub carregadas.");
+            }
+        })
+        .catch(error => console.error("Erro ao carregar missas salvas do GitHub:", error));
 }
 
-// Exportar funções para uso global
-window.EMissa = {
-    reloadCanticos,
-    saveMissa,
-    loadSavedMissa
-};
+// Salvar missa no GitHub
+function saveMissaToGitHub(missaData) {
+    let savedMissas = JSON.parse(localStorage.getItem("savedMissas")) || [];
+    const content = btoa(JSON.stringify(savedMissas));
+    const message = "Atualiza missas salvas";
+    updateGitHubContent("saved_missas.json", content, message)
+        .then(() => console.log("Missa salva no GitHub com sucesso!"))
+        .catch(error => console.error("Erro ao salvar missa no GitHub:", error));
+}
+
 
