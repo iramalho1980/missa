@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Carregar cânticos da estrutura de pastas
 function loadCanticos() {
     // Estrutura reorganizada na sequência da missa do tempo comum
-    canticosData = {
+canticosData = {
         'Entrada': [
             'a_biblia_e_a_palavra_de_deus.pdf',
             'bom_pastor.pdf',
@@ -93,6 +93,11 @@ function loadCanticos() {
             'santo_santo_e.pdf',
             'santo_santo_santo_eh_o_senhor_novo.jpeg'
         ],
+        'Abraco_de_Paz': [
+            'esteja_sempre_com_voce.pdf',
+            'irmao_minha_paz_eu_te_dou.pdf',
+            'paz_paz_de_cristo.pdf'
+        ],
         'Cordeiro': [
             'cordeiro_do_maior.pdf'
         ],
@@ -121,11 +126,6 @@ function loadCanticos() {
             'vou_cantar_teu_amor.pdf',
             'eis_que_sou_o_pao_da_vida.jpeg',
             'todo_aquele_que_comer.jpeg'
-        ],
-        'Abraco_de_Paz': [
-            'esteja_sempre_com_voce.pdf',
-            'irmao_minha_paz_eu_te_dou.pdf',
-            'paz_paz_de_cristo.pdf'
         ],
         'Final': [
             'a_alegria_esta_no_coracao.pdf',
